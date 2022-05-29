@@ -20,7 +20,7 @@ $ npm install -g @supernovaio/cli
 $ oex COMMAND
 running command...
 $ oex (--version)
-@supernovaio/cli/0.1.0 darwin-arm64 node-v14.18.2
+@supernovaio/cli/0.1.0 darwin-x64 node-v12.21.0
 $ oex --help [COMMAND]
 USAGE
   $ oex COMMAND
@@ -39,7 +39,7 @@ USAGE
 * [`oex plugins:uninstall PLUGIN...`](#oex-pluginsuninstall-plugin-1)
 * [`oex plugins:uninstall PLUGIN...`](#oex-pluginsuninstall-plugin-2)
 * [`oex plugins update`](#oex-plugins-update)
-* [`oex sync-design-tokens WORKSPACEID DESIGNSYSTEMID BRANDNAME INPUT`](#oex-sync-design-tokens-workspaceid-designsystemid-brandname-input)
+* [`oex sync-design-tokens`](#oex-sync-design-tokens)
 
 ## `oex help [COMMAND]`
 
@@ -291,25 +291,28 @@ DESCRIPTION
   Update installed plugins.
 ```
 
-## `oex sync-design-tokens WORKSPACEID DESIGNSYSTEMID BRANDNAME INPUT`
+## `oex sync-design-tokens`
 
 Supernova CLI description TODO
 
 ```
 USAGE
-  $ oex sync-design-tokens [WORKSPACEID] [DESIGNSYSTEMID] [BRANDNAME] [INPUT]
+  $ oex sync-design-tokens -k <value> -d <value> [-b <value>] [-i <value> | -p <value>] [-r]
 
-ARGUMENTS
-  WORKSPACEID     Workspace to synchronize contents with
-  DESIGNSYSTEMID  Design System to synchronize contents with
-  BRANDNAME       Brand to synchronize contents with
-  INPUT           Contents of design tokens plugin definition JSON file
+FLAGS
+  -b, --brandName=<value>       Brand to synchronize contents with
+  -d, --designSystemId=<value>  (required) Design System to synchronize contents with
+  -i, --input=<value>           Contents of design tokens plugin definition JSON file
+  -k, --apiKey=<value>          (required) API key to use for accessing Supernova instance
+  -p, --inputPath=<value>       Contents of design tokens plugin definition JSON file
+  -r, --dryRun                  When enabled, CLI will validate entire setup including loading/parsing/merging of tokens
+                                but will stop before writing them to remote source
 
 DESCRIPTION
   Supernova CLI description TODO
 
 EXAMPLES
-  $ @supernovaio/cli sync-design-tokens --workspaceId=123 --designSystemId=456 --brandName="Test" --input "{}"
+  $ @supernovaio/cli sync-design-tokens --apiKey="{key}" --workspaceId=123 --designSystemId=456 --brandName="Test" --input "{}"
 ```
 
 _See code: [dist/commands/sync-design-tokens.ts](https://github.com/oclif/hello-world/blob/v0.1.0/dist/commands/sync-design-tokens.ts)_
