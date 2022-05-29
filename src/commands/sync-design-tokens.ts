@@ -18,7 +18,7 @@ import { Command, Flags } from "@oclif/core"
 // MARK: - Tool implementation
 
 /** Command that handles synchronization with design tokens plugin */
-export class CommandSyncDesignTokens extends Command {
+export class SyncDesignTokens extends Command {
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   // MARK: - Command configuration
 
@@ -50,10 +50,9 @@ export class CommandSyncDesignTokens extends Command {
   // MARK: - Command runtime
 
   async run(): Promise<void> {
-    const { args, flags } = await this.parse(CommandSyncDesignTokens)
+    const { args, flags } = await this.parse(SyncDesignTokens)
     this.log(JSON.stringify(args, null, 2))
     this.log(JSON.stringify(flags, null, 2))
     this.log("command did run!")
-    this.log(`hello ${args.person} from ${flags.from}! (./src/commands/hello/index.ts)`)
   }
 }

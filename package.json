@@ -11,13 +11,15 @@
         "@oclif/core": "^1",
         "@oclif/plugin-help": "^5",
         "@oclif/plugin-plugins": "^2.0.1",
-        "@supernovaio/supernova-sdk": "^1.7.5"
+        "@supernovaio/supernova-sdk": "^1.7.5",
+        "chalk": "^5.0.1",
+        "node-fetch": "^3.2.4"
     },
     "devDependencies": {
         "@oclif/test": "^2",
         "@types/chai": "^4",
         "@types/mocha": "^9.0.0",
-        "@types/node": "^16.9.4",
+        "@types/node": "^16.11.36",
         "chai": "^4",
         "eslint": "^7.32.0",
         "eslint-config-oclif": "^4",
@@ -55,8 +57,8 @@
         ],
         "topicSeparator": " ",
         "topics": {
-            "hello": {
-                "description": "Say hello to the world and others"
+            "sync-design-tokens": {
+                "description": "Synchronize tokens between design tokens plugin and Supernova design system"
             }
         }
     },

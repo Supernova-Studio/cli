@@ -29,7 +29,6 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`oex hello command-sync-design-tokens WORKSPACEID DESIGNSYSTEMID BRANDNAME INPUT`](#oex-hello-command-sync-design-tokens-workspaceid-designsystemid-brandname-input)
 * [`oex help [COMMAND]`](#oex-help-command)
 * [`oex plugins`](#oex-plugins)
 * [`oex plugins:install PLUGIN...`](#oex-pluginsinstall-plugin)
@@ -40,27 +39,7 @@ USAGE
 * [`oex plugins:uninstall PLUGIN...`](#oex-pluginsuninstall-plugin-1)
 * [`oex plugins:uninstall PLUGIN...`](#oex-pluginsuninstall-plugin-2)
 * [`oex plugins update`](#oex-plugins-update)
-
-## `oex hello command-sync-design-tokens WORKSPACEID DESIGNSYSTEMID BRANDNAME INPUT`
-
-Supernova CLI description TODO
-
-```
-USAGE
-  $ oex hello command-sync-design-tokens [WORKSPACEID] [DESIGNSYSTEMID] [BRANDNAME] [INPUT]
-
-ARGUMENTS
-  WORKSPACEID     Workspace to synchronize contents with
-  DESIGNSYSTEMID  Design System to synchronize contents with
-  BRANDNAME       Brand to synchronize contents with
-  INPUT           Contents of design tokens plugin definition JSON file
-
-DESCRIPTION
-  Supernova CLI description TODO
-
-EXAMPLES
-  $ @supernovaio/cli sync-design-tokens --workspaceId=123 --designSystemId=456 --brandName="Test" --input "{}"
-```
+* [`oex sync-design-tokens WORKSPACEID DESIGNSYSTEMID BRANDNAME INPUT`](#oex-sync-design-tokens-workspaceid-designsystemid-brandname-input)
 
 ## `oex help [COMMAND]`
 
@@ -311,4 +290,27 @@ FLAGS
 DESCRIPTION
   Update installed plugins.
 ```
+
+## `oex sync-design-tokens WORKSPACEID DESIGNSYSTEMID BRANDNAME INPUT`
+
+Supernova CLI description TODO
+
+```
+USAGE
+  $ oex sync-design-tokens [WORKSPACEID] [DESIGNSYSTEMID] [BRANDNAME] [INPUT]
+
+ARGUMENTS
+  WORKSPACEID     Workspace to synchronize contents with
+  DESIGNSYSTEMID  Design System to synchronize contents with
+  BRANDNAME       Brand to synchronize contents with
+  INPUT           Contents of design tokens plugin definition JSON file
+
+DESCRIPTION
+  Supernova CLI description TODO
+
+EXAMPLES
+  $ @supernovaio/cli sync-design-tokens --workspaceId=123 --designSystemId=456 --brandName="Test" --input "{}"
+```
+
+_See code: [dist/commands/sync-design-tokens.ts](https://github.com/oclif/hello-world/blob/v0.1.0/dist/commands/sync-design-tokens.ts)_
 <!-- commandsstop -->
