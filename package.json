@@ -3,10 +3,24 @@
     "description": "Supernova.io Command Line Interface",
     "version": "0.1.0",
     "author": "Supernova.io",
+    "homepage": "https://supernova.io/",
+    "keywords": [
+        "Supernova",
+        "Design Systems",
+        "Supernovaio",
+        "SDK",
+        "Design Tokens",
+        "Tokens",
+        "Assets",
+        "Components",
+        "Documentation",
+        "CMS"
+    ],
+    "license": "MIT",
     "bin": {
-        "oex": "./bin/run"
+        "supernova": "./bin/run"
     },
-    "bugs": "https://github.com/oclif/hello-world/issues",
+    "bugs": "https://github.com/Supernova-Studio/cli/issues",
     "dependencies": {
         "@oclif/core": "^1",
         "@oclif/plugin-help": "^5",
@@ -41,15 +55,10 @@
         "/npm-shrinkwrap.json",
         "/oclif.manifest.json"
     ],
-    "homepage": "https://github.com/oclif/hello-world",
-    "keywords": [
-        "oclif"
-    ],
-    "license": "MIT",
     "main": "dist/index.js",
     "oclif": {
-        "bin": "oex",
-        "dirname": "oex",
+        "bin": "supernova",
+        "dirname": "supernova",
         "commands": "./dist/commands",
         "plugins": [
             "@oclif/plugin-help",
@@ -62,7 +71,7 @@
             }
         }
     },
-    "repository": "oclif/hello-world",
+    "repository": "https://github.com/Supernova-Studio/cli",
     "scripts": {
         "build": "shx rm -rf dist && tsc -b",
         "lint": "eslint . --ext .ts --config .eslintrc",
@@ -70,7 +79,8 @@
         "posttest": "yarn lint",
         "prepack": "yarn build && oclif manifest && oclif readme",
         "test": "mocha --forbid-only \"test/**/*.test.ts\"",
-        "version": "oclif readme && git add README.md"
+        "version": "oclif readme && git add README.md",
+        "publish-package": "npm run build && npm run prepack && npm publish --access public && npm run postpack"
     },
     "types": "dist/index.d.ts"
 }

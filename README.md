@@ -17,37 +17,37 @@ oclif example Hello World CLI
 <!-- usage -->
 ```sh-session
 $ npm install -g @supernovaio/cli
-$ oex COMMAND
+$ supernova COMMAND
 running command...
-$ oex (--version)
+$ supernova (--version)
 @supernovaio/cli/0.1.0 darwin-x64 node-v12.21.0
-$ oex --help [COMMAND]
+$ supernova --help [COMMAND]
 USAGE
-  $ oex COMMAND
+  $ supernova COMMAND
 ...
 ```
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`oex help [COMMAND]`](#oex-help-command)
-* [`oex plugins`](#oex-plugins)
-* [`oex plugins:install PLUGIN...`](#oex-pluginsinstall-plugin)
-* [`oex plugins:inspect PLUGIN...`](#oex-pluginsinspect-plugin)
-* [`oex plugins:install PLUGIN...`](#oex-pluginsinstall-plugin-1)
-* [`oex plugins:link PLUGIN`](#oex-pluginslink-plugin)
-* [`oex plugins:uninstall PLUGIN...`](#oex-pluginsuninstall-plugin)
-* [`oex plugins:uninstall PLUGIN...`](#oex-pluginsuninstall-plugin-1)
-* [`oex plugins:uninstall PLUGIN...`](#oex-pluginsuninstall-plugin-2)
-* [`oex plugins update`](#oex-plugins-update)
-* [`oex sync-design-tokens`](#oex-sync-design-tokens)
+* [`supernova help [COMMAND]`](#supernova-help-command)
+* [`supernova plugins`](#supernova-plugins)
+* [`supernova plugins:install PLUGIN...`](#supernova-pluginsinstall-plugin)
+* [`supernova plugins:inspect PLUGIN...`](#supernova-pluginsinspect-plugin)
+* [`supernova plugins:install PLUGIN...`](#supernova-pluginsinstall-plugin-1)
+* [`supernova plugins:link PLUGIN`](#supernova-pluginslink-plugin)
+* [`supernova plugins:uninstall PLUGIN...`](#supernova-pluginsuninstall-plugin)
+* [`supernova plugins:uninstall PLUGIN...`](#supernova-pluginsuninstall-plugin-1)
+* [`supernova plugins:uninstall PLUGIN...`](#supernova-pluginsuninstall-plugin-2)
+* [`supernova plugins update`](#supernova-plugins-update)
+* [`supernova sync-design-tokens`](#supernova-sync-design-tokens)
 
-## `oex help [COMMAND]`
+## `supernova help [COMMAND]`
 
-Display help for oex.
+Display help for supernova.
 
 ```
 USAGE
-  $ oex help [COMMAND] [-n]
+  $ supernova help [COMMAND] [-n]
 
 ARGUMENTS
   COMMAND  Command to show help for.
@@ -56,18 +56,18 @@ FLAGS
   -n, --nested-commands  Include all nested commands in the output.
 
 DESCRIPTION
-  Display help for oex.
+  Display help for supernova.
 ```
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v5.1.12/src/commands/help.ts)_
 
-## `oex plugins`
+## `supernova plugins`
 
 List installed plugins.
 
 ```
 USAGE
-  $ oex plugins [--core]
+  $ supernova plugins [--core]
 
 FLAGS
   --core  Show core plugins.
@@ -76,18 +76,18 @@ DESCRIPTION
   List installed plugins.
 
 EXAMPLES
-  $ oex plugins
+  $ supernova plugins
 ```
 
 _See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v2.1.0/src/commands/plugins/index.ts)_
 
-## `oex plugins:install PLUGIN...`
+## `supernova plugins:install PLUGIN...`
 
 Installs a plugin into the CLI.
 
 ```
 USAGE
-  $ oex plugins:install PLUGIN...
+  $ supernova plugins:install PLUGIN...
 
 ARGUMENTS
   PLUGIN  Plugin to install.
@@ -109,23 +109,23 @@ DESCRIPTION
   the CLI without the need to patch and update the whole CLI.
 
 ALIASES
-  $ oex plugins add
+  $ supernova plugins add
 
 EXAMPLES
-  $ oex plugins:install myplugin 
+  $ supernova plugins:install myplugin 
 
-  $ oex plugins:install https://github.com/someuser/someplugin
+  $ supernova plugins:install https://github.com/someuser/someplugin
 
-  $ oex plugins:install someuser/someplugin
+  $ supernova plugins:install someuser/someplugin
 ```
 
-## `oex plugins:inspect PLUGIN...`
+## `supernova plugins:inspect PLUGIN...`
 
 Displays installation properties of a plugin.
 
 ```
 USAGE
-  $ oex plugins:inspect PLUGIN...
+  $ supernova plugins:inspect PLUGIN...
 
 ARGUMENTS
   PLUGIN  [default: .] Plugin to inspect.
@@ -138,16 +138,16 @@ DESCRIPTION
   Displays installation properties of a plugin.
 
 EXAMPLES
-  $ oex plugins:inspect myplugin
+  $ supernova plugins:inspect myplugin
 ```
 
-## `oex plugins:install PLUGIN...`
+## `supernova plugins:install PLUGIN...`
 
 Installs a plugin into the CLI.
 
 ```
 USAGE
-  $ oex plugins:install PLUGIN...
+  $ supernova plugins:install PLUGIN...
 
 ARGUMENTS
   PLUGIN  Plugin to install.
@@ -169,23 +169,23 @@ DESCRIPTION
   the CLI without the need to patch and update the whole CLI.
 
 ALIASES
-  $ oex plugins add
+  $ supernova plugins add
 
 EXAMPLES
-  $ oex plugins:install myplugin 
+  $ supernova plugins:install myplugin 
 
-  $ oex plugins:install https://github.com/someuser/someplugin
+  $ supernova plugins:install https://github.com/someuser/someplugin
 
-  $ oex plugins:install someuser/someplugin
+  $ supernova plugins:install someuser/someplugin
 ```
 
-## `oex plugins:link PLUGIN`
+## `supernova plugins:link PLUGIN`
 
 Links a plugin into the CLI for development.
 
 ```
 USAGE
-  $ oex plugins:link PLUGIN
+  $ supernova plugins:link PLUGIN
 
 ARGUMENTS
   PATH  [default: .] path to plugin
@@ -203,16 +203,16 @@ DESCRIPTION
   command will override the user-installed or core plugin implementation. This is useful for development work.
 
 EXAMPLES
-  $ oex plugins:link myplugin
+  $ supernova plugins:link myplugin
 ```
 
-## `oex plugins:uninstall PLUGIN...`
+## `supernova plugins:uninstall PLUGIN...`
 
 Removes a plugin from the CLI.
 
 ```
 USAGE
-  $ oex plugins:uninstall PLUGIN...
+  $ supernova plugins:uninstall PLUGIN...
 
 ARGUMENTS
   PLUGIN  plugin to uninstall
@@ -225,17 +225,17 @@ DESCRIPTION
   Removes a plugin from the CLI.
 
 ALIASES
-  $ oex plugins unlink
-  $ oex plugins remove
+  $ supernova plugins unlink
+  $ supernova plugins remove
 ```
 
-## `oex plugins:uninstall PLUGIN...`
+## `supernova plugins:uninstall PLUGIN...`
 
 Removes a plugin from the CLI.
 
 ```
 USAGE
-  $ oex plugins:uninstall PLUGIN...
+  $ supernova plugins:uninstall PLUGIN...
 
 ARGUMENTS
   PLUGIN  plugin to uninstall
@@ -248,17 +248,17 @@ DESCRIPTION
   Removes a plugin from the CLI.
 
 ALIASES
-  $ oex plugins unlink
-  $ oex plugins remove
+  $ supernova plugins unlink
+  $ supernova plugins remove
 ```
 
-## `oex plugins:uninstall PLUGIN...`
+## `supernova plugins:uninstall PLUGIN...`
 
 Removes a plugin from the CLI.
 
 ```
 USAGE
-  $ oex plugins:uninstall PLUGIN...
+  $ supernova plugins:uninstall PLUGIN...
 
 ARGUMENTS
   PLUGIN  plugin to uninstall
@@ -271,17 +271,17 @@ DESCRIPTION
   Removes a plugin from the CLI.
 
 ALIASES
-  $ oex plugins unlink
-  $ oex plugins remove
+  $ supernova plugins unlink
+  $ supernova plugins remove
 ```
 
-## `oex plugins update`
+## `supernova plugins update`
 
 Update installed plugins.
 
 ```
 USAGE
-  $ oex plugins update [-h] [-v]
+  $ supernova plugins update [-h] [-v]
 
 FLAGS
   -h, --help     Show CLI help.
@@ -291,13 +291,13 @@ DESCRIPTION
   Update installed plugins.
 ```
 
-## `oex sync-design-tokens`
+## `supernova sync-design-tokens`
 
 Supernova CLI description TODO
 
 ```
 USAGE
-  $ oex sync-design-tokens -k <value> -d <value> [-b <value>] [-i <value> | -p <value>] [-r]
+  $ supernova sync-design-tokens -k <value> -d <value> [-b <value>] [-i <value> | -p <value>] [-r]
 
 FLAGS
   -b, --brandName=<value>       Brand to synchronize contents with
@@ -315,5 +315,5 @@ EXAMPLES
   $ @supernovaio/cli sync-design-tokens --apiKey="{key}" --workspaceId=123 --designSystemId=456 --brandName="Test" --input "{}"
 ```
 
-_See code: [dist/commands/sync-design-tokens.ts](https://github.com/oclif/hello-world/blob/v0.1.0/dist/commands/sync-design-tokens.ts)_
+_See code: [dist/commands/sync-design-tokens.ts](https://github.com/Supernova-Studio/cli/blob/v0.1.0/dist/commands/sync-design-tokens.ts)_
 <!-- commandsstop -->
