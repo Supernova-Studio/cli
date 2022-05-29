@@ -20,7 +20,7 @@ $ npm install -g oclif-hello-world
 $ oex COMMAND
 running command...
 $ oex (--version)
-oclif-hello-world/0.0.0 darwin-x64 node-v16.13.1
+oclif-hello-world/0.0.0 darwin-arm64 node-v14.18.2
 $ oex --help [COMMAND]
 USAGE
   $ oex COMMAND
@@ -33,10 +33,13 @@ USAGE
 * [`oex hello world`](#oex-hello-world)
 * [`oex help [COMMAND]`](#oex-help-command)
 * [`oex plugins`](#oex-plugins)
-* [`oex plugins:inspect PLUGIN...`](#oex-pluginsinspect-plugin)
 * [`oex plugins:install PLUGIN...`](#oex-pluginsinstall-plugin)
+* [`oex plugins:inspect PLUGIN...`](#oex-pluginsinspect-plugin)
+* [`oex plugins:install PLUGIN...`](#oex-pluginsinstall-plugin-1)
 * [`oex plugins:link PLUGIN`](#oex-pluginslink-plugin)
 * [`oex plugins:uninstall PLUGIN...`](#oex-pluginsuninstall-plugin)
+* [`oex plugins:uninstall PLUGIN...`](#oex-pluginsuninstall-plugin-1)
+* [`oex plugins:uninstall PLUGIN...`](#oex-pluginsuninstall-plugin-2)
 * [`oex plugins update`](#oex-plugins-update)
 
 ## `oex hello PERSON`
@@ -97,7 +100,7 @@ DESCRIPTION
   Display help for oex.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v5.1.10/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v5.1.12/src/commands/help.ts)_
 
 ## `oex plugins`
 
@@ -117,7 +120,45 @@ EXAMPLES
   $ oex plugins
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v2.0.11/src/commands/plugins/index.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v2.1.0/src/commands/plugins/index.ts)_
+
+## `oex plugins:install PLUGIN...`
+
+Installs a plugin into the CLI.
+
+```
+USAGE
+  $ oex plugins:install PLUGIN...
+
+ARGUMENTS
+  PLUGIN  Plugin to install.
+
+FLAGS
+  -f, --force    Run yarn install with force flag.
+  -h, --help     Show CLI help.
+  -v, --verbose
+
+DESCRIPTION
+  Installs a plugin into the CLI.
+
+  Can be installed from npm or a git url.
+
+  Installation of a user-installed plugin will override a core plugin.
+
+  e.g. If you have a core plugin that has a 'hello' command, installing a user-installed plugin with a 'hello' command
+  will override the core plugin implementation. This is useful if a user needs to update core plugin functionality in
+  the CLI without the need to patch and update the whole CLI.
+
+ALIASES
+  $ oex plugins add
+
+EXAMPLES
+  $ oex plugins:install myplugin 
+
+  $ oex plugins:install https://github.com/someuser/someplugin
+
+  $ oex plugins:install someuser/someplugin
+```
 
 ## `oex plugins:inspect PLUGIN...`
 
@@ -204,6 +245,52 @@ DESCRIPTION
 
 EXAMPLES
   $ oex plugins:link myplugin
+```
+
+## `oex plugins:uninstall PLUGIN...`
+
+Removes a plugin from the CLI.
+
+```
+USAGE
+  $ oex plugins:uninstall PLUGIN...
+
+ARGUMENTS
+  PLUGIN  plugin to uninstall
+
+FLAGS
+  -h, --help     Show CLI help.
+  -v, --verbose
+
+DESCRIPTION
+  Removes a plugin from the CLI.
+
+ALIASES
+  $ oex plugins unlink
+  $ oex plugins remove
+```
+
+## `oex plugins:uninstall PLUGIN...`
+
+Removes a plugin from the CLI.
+
+```
+USAGE
+  $ oex plugins:uninstall PLUGIN...
+
+ARGUMENTS
+  PLUGIN  plugin to uninstall
+
+FLAGS
+  -h, --help     Show CLI help.
+  -v, --verbose
+
+DESCRIPTION
+  Removes a plugin from the CLI.
+
+ALIASES
+  $ oex plugins unlink
+  $ oex plugins remove
 ```
 
 ## `oex plugins:uninstall PLUGIN...`
