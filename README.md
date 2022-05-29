@@ -20,7 +20,7 @@ $ npm install -g @supernovaio/cli
 $ supernova COMMAND
 running command...
 $ supernova (--version)
-@supernovaio/cli/0.1.0 darwin-x64 node-v12.21.0
+@supernovaio/cli/0.1.1 darwin-x64 node-v12.21.0
 $ supernova --help [COMMAND]
 USAGE
   $ supernova COMMAND
@@ -315,5 +315,5 @@ EXAMPLES
   $ @supernovaio/cli sync-design-tokens --apiKey="{key}" --workspaceId=123 --designSystemId=456 --brandName="Test" --input "{}"
 ```
 
-_See code: [dist/commands/sync-design-tokens.ts](https://github.com/Supernova-Studio/cli/blob/v0.1.0/dist/commands/sync-design-tokens.ts)_
+_See code: [dist/commands/sync-design-tokens.ts](https://github.com/Supernova-Studio/cli/blob/v0.1.1/dist/commands/sync-design-tokens.ts)_
 <!-- commandsstop -->
