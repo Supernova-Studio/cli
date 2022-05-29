@@ -16,11 +16,11 @@ oclif example Hello World CLI
 # Usage
 <!-- usage -->
 ```sh-session
-$ npm install -g oclif-hello-world
+$ npm install -g @supernovaio/cli
 $ oex COMMAND
 running command...
 $ oex (--version)
-oclif-hello-world/0.0.0 darwin-arm64 node-v14.18.2
+@supernovaio/cli/0.1.0 darwin-arm64 node-v14.18.2
 $ oex --help [COMMAND]
 USAGE
   $ oex COMMAND
@@ -29,8 +29,7 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`oex hello PERSON`](#oex-hello-person)
-* [`oex hello world`](#oex-hello-world)
+* [`oex hello command-sync-design-tokens WORKSPACEID DESIGNSYSTEMID BRANDNAME INPUT`](#oex-hello-command-sync-design-tokens-workspaceid-designsystemid-brandname-input)
 * [`oex help [COMMAND]`](#oex-help-command)
 * [`oex plugins`](#oex-plugins)
 * [`oex plugins:install PLUGIN...`](#oex-pluginsinstall-plugin)
@@ -42,44 +41,25 @@ USAGE
 * [`oex plugins:uninstall PLUGIN...`](#oex-pluginsuninstall-plugin-2)
 * [`oex plugins update`](#oex-plugins-update)
 
-## `oex hello PERSON`
+## `oex hello command-sync-design-tokens WORKSPACEID DESIGNSYSTEMID BRANDNAME INPUT`
 
-Say hello
+Supernova CLI description TODO
 
 ```
 USAGE
-  $ oex hello [PERSON] -f <value>
+  $ oex hello command-sync-design-tokens [WORKSPACEID] [DESIGNSYSTEMID] [BRANDNAME] [INPUT]
 
 ARGUMENTS
-  PERSON  Person to say hello to
-
-FLAGS
-  -f, --from=<value>  (required) Whom is saying hello
-
-DESCRIPTION
-  Say hello
-
-EXAMPLES
-  $ oex hello friend --from oclif
-  hello friend from oclif! (./src/commands/hello/index.ts)
-```
-
-_See code: [dist/commands/hello/index.ts](https://github.com/oclif/hello-world/blob/v0.0.0/dist/commands/hello/index.ts)_
-
-## `oex hello world`
-
-Say hello world
-
-```
-USAGE
-  $ oex hello world
+  WORKSPACEID     Workspace to synchronize contents with
+  DESIGNSYSTEMID  Design System to synchronize contents with
+  BRANDNAME       Brand to synchronize contents with
+  INPUT           Contents of design tokens plugin definition JSON file
 
 DESCRIPTION
-  Say hello world
+  Supernova CLI description TODO
 
 EXAMPLES
-  $ oex hello world
-  hello world! (./src/commands/hello/world.ts)
+  $ @supernovaio/cli sync-design-tokens --workspaceId=123 --designSystemId=456 --brandName="Test" --input "{}"
 ```
 
 ## `oex help [COMMAND]`
