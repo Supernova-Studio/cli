@@ -10,6 +10,7 @@
 // MARK: - Imports
 
 import { Command, Flags } from "@oclif/core"
+import { Supernova } from "@supernovaio/supernova-sdk"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Configuration

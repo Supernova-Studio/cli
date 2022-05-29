@@ -11,7 +11,7 @@
         "@oclif/core": "^1",
         "@oclif/plugin-help": "^5",
         "@oclif/plugin-plugins": "^2.0.1",
-        "@supernovaio/supernova-sdk": "^1.7.5",
+        "@supernovaio/supernova-sdk": "^1.7.6",
         "chalk": "^5.0.1",
         "node-fetch": "^3.2.4"
     },
