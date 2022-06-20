@@ -29,7 +29,7 @@ export class SyncDesignTokens extends Command {
 
   // Examples how to use the command
   static examples = [
-    `$ @supernovaio/cli sync-design-tokens --apiKey="{key}" --workspaceId=123 --designSystemId=456 --brandName="Test" --input "{}"`,
+    `$ @supernovaio/cli sync-design-tokens --apiKey="{key}" --designSystemId=456 --brandName="Test" --input "{}"`,
   ]
 
   // How this command can be run
