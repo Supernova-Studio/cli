@@ -1,0 +1,24 @@
+[
+  {
+    "id": "079b44a8b28ed46aff5be1542d750aaa108d08e1",
+    "name": "Brand A - Light",
+    "selectedTokenSets": {
+      "global": "source",
+      "light": "enabled",
+      "dark": "disabled",
+      "theme": "disabled"
+    },
+    "$figmaStyleReferences": {}
+  },
+  {
+    "id": "d7f7ed73c544a76604e81ff7a6be59bc9ab43fad",
+    "name": "Brand A - Dark",
+    "selectedTokenSets": {
+      "global": "source",
+      "light": "disabled",
+      "dark": "enabled",
+      "theme": "disabled"
+    },
+    "$figmaStyleReferences": {}
+  }
+]

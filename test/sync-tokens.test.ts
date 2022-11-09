@@ -9,16 +9,26 @@
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Imports
 
-import { expect, test } from '@oclif/test'
+import { expect, test } from "@oclif/test"
+import * as path from "path"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Tests
 
-describe('sync-tokens-single-file', () => {
+describe("sync-tokens-single-file", () => {
   test
     .stdout()
-    .command(['sync-tokens'])
-    .it('runs single-file sync', (ctx) => {
-        expect(ctx.stdout).to.equal("Test")
+    .command([
+      "sync-tokens",
+      `--apiKey=${process.env.TEST_API_KEY}`,
+      `--designSystemId=${process.env.TEST_DB_DESIGN_SYSTEM_ID}`,
+      `--tokenDirPath="${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "tokens.json")}"`,
+      `--configFilePath="${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "supernova.settings.json")}"`,
+      `--dev`
+    ])
+    .it("runs single-file sync", (ctx) => {
+      console.log("x")
+      expect(ctx.stdout).to.equal("Test")
+      console.log("y")
     })
 })

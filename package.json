@@ -27,7 +27,8 @@
         "@oclif/plugin-plugins": "^2.0.1",
         "@supernovaio/supernova-sdk": "^1.8.10",
         "chalk": "^5.0.1",
-        "node-fetch": "^3.2.4"
+        "node-fetch": "^3.2.4",
+        "dotenv": "^16.0.0"
     },
     "devDependencies": {
         "@babel/register": "^7.18.9",

@@ -14,6 +14,18 @@ import { Brand, DesignSystem, DesignSystemVersion, Supernova, SupernovaToolsDesi
 import { DTProcessedTokenNode } from "@supernovaio/supernova-sdk/build/Typescript/src/tools/design-tokens/utilities/SDKDTJSONConverter"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+// MARK: - Definition
+
+interface SyncDesignTokensFlags {
+  apiKey: string
+  designSystemId: string
+  tokenFilePath?: string
+  tokenDirPath?: string
+  configFilePath: string
+  dev: boolean
+}
+
+// --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Configuration
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -45,7 +57,7 @@ export class SyncDesignTokens extends Command {
     tokenFilePath: Flags.string({description: 'Path to JSON file containing token definitions', exactlyOne: ["tokenDirPath", "tokenFilePath"]}),
     tokenDirPath: Flags.string({description: 'Path to directory of JSON files containing token definitions', exactlyOne: ["tokenDirPath", "tokenFilePath"]}),
     configFilePath: Flags.string({description: 'Path to configuration JSON file', required: true, exclusive: []}),
-    dev: Flags.boolean({description: 'When enabled, CLI will target dev server', hidden: true})
+    dev: Flags.boolean({description: 'When enabled, CLI will target dev server', hidden: true, default: false})
   }
 
   // Required and optional attributes
@@ -71,17 +83,25 @@ export class SyncDesignTokens extends Command {
     this.log(`Tokens synchronized`)
   }
 
-  async getWritableVersion(flags: any): Promise<{
+  async getWritableVersion(flags: SyncDesignTokensFlags): Promise<{
     instance: Supernova
     designSystem: DesignSystem,
     version: DesignSystemVersion
   }> {
 
+    if (!flags.apiKey || flags.apiKey.length === 0) {
+      throw new Error(`API key must not be empty`)
+    }
+
+    if (!flags.designSystemId || flags.designSystemId.length === 0) {
+      throw new Error(`Design System ID must not be empty`)
+    }
+
     // Create instance for prod / dev
     const devAPIhost = "https://dev.api2.supernova.io/api"
-    let supernova = new Supernova(flags.apiKey, flags.dev ? devAPIhost : null, null) 
+    let sdkInstance = new Supernova(flags.apiKey, flags.dev ? devAPIhost : null, null) 
 
-    let designSystem = await supernova.designSystem(flags.designSystemId)
+    let designSystem = await sdkInstance.designSystem(flags.designSystemId)
     if (!designSystem) {
       throw new Error(`Design system ${flags.designSystemId} not found or not available under provided API key`)
     }
@@ -92,7 +112,7 @@ export class SyncDesignTokens extends Command {
     }
 
     return {
-      instance: supernova,
+      instance: sdkInstance,
       designSystem: designSystem,
       version: version
     }
