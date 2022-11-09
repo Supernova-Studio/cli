@@ -83,7 +83,7 @@
         "postpack": "shx rm -f oclif.manifest.json",
         "posttest": "yarn lint",
         "prepack": "yarn build && oclif manifest",
-        "test": "env TS_NODE_PROJECT=\"tsconfig.testing.json\" mocha --require ts-node/register --forbid-only \"test/**/*.test.ts\"",
+        "test": "npm run build && env TS_NODE_PROJECT=\"tsconfig.testing.json\" mocha --require ts-node/register --forbid-only \"test/**/*.test.ts\"",
         "publish-package": "npm run build && npm run prepack && npm publish --access public && npm run postpack"
     },
     "types": "dist/index.d.ts"

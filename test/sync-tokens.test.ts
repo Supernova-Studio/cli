@@ -16,19 +16,23 @@ import * as path from "path"
 // MARK: - Tests
 
 describe("sync-tokens-single-file", () => {
+  const commandAttributes = [
+    "sync-tokens",
+    `--apiKey=${process.env.TEST_API_KEY}`,
+    `--designSystemId=${process.env.TEST_DB_DESIGN_SYSTEM_ID}`,
+    `--tokenFilePath="${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "tokens.json")}"`,
+    `--configFilePath="${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "supernova.settings.json")}"`,
+    `--dev`,
+  ]
+
   test
-    .stdout()
-    .command([
-      "sync-tokens",
-      `--apiKey=${process.env.TEST_API_KEY}`,
-      `--designSystemId=${process.env.TEST_DB_DESIGN_SYSTEM_ID}`,
-      `--tokenDirPath="${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "tokens.json")}"`,
-      `--configFilePath="${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "supernova.settings.json")}"`,
-      `--dev`
-    ])
-    .it("runs single-file sync", (ctx) => {
-      console.log("x")
-      expect(ctx.stdout).to.equal("Test")
-      console.log("y")
+    .do((ctx) => {
+      console.log(commandAttributes.join(" "))
     })
+    .stdout()
+    .command(commandAttributes)
+    .catch((error) => {
+      console.log(error)
+    })
+    .it()
 })

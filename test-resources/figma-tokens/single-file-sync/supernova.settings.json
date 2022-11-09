@@ -12,7 +12,7 @@
         }
     ],
     "settings": {
-        "dryRun": true,
-        "verbose": true
+        "dryRun": false,
+        "verbose": false
     }
 }
