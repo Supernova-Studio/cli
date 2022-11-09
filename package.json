@@ -1,7 +1,7 @@
 {
     "name": "@supernovaio/cli",
     "description": "Supernova.io Command Line Interface",
-    "version": "0.1.2",
+    "version": "0.9.0",
     "author": "Supernova.io",
     "homepage": "https://supernova.io/",
     "keywords": [
@@ -25,7 +25,7 @@
         "@oclif/core": "^1",
         "@oclif/plugin-help": "^5",
         "@oclif/plugin-plugins": "^2.0.1",
-        "@supernovaio/supernova-sdk": "^1.7.9",
+        "@supernovaio/supernova-sdk": "^1.8.10",
         "chalk": "^5.0.1",
         "node-fetch": "^3.2.4"
     },
@@ -66,8 +66,8 @@
         ],
         "topicSeparator": " ",
         "topics": {
-            "sync-design-tokens": {
-                "description": "Synchronize tokens between design tokens plugin and Supernova design system"
+            "sync-tokens": {
+                "description": "Synchronize tokens from Figma Tokens plugin to Supernova workspaces"
             }
         }
     },
@@ -77,9 +77,8 @@
         "lint": "eslint . --ext .ts --config .eslintrc",
         "postpack": "shx rm -f oclif.manifest.json",
         "posttest": "yarn lint",
-        "prepack": "yarn build && oclif manifest && oclif readme",
+        "prepack": "yarn build && oclif manifest",
         "test": "mocha --forbid-only \"test/**/*.test.ts\"",
-        "version": "oclif readme && git add README.md",
         "publish-package": "npm run build && npm run prepack && npm publish --access public && npm run postpack"
     },
     "types": "dist/index.d.ts"
