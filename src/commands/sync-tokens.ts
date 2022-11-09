@@ -1,9 +1,9 @@
 //
-//  CommandSyncDesignTokens.ts
-//  Supernova SDK
+//  sync-tokens.ts
+//  Supernova CLI
 //
 //  Created by Jiri Trecak.
-//  Copyright © 2022 Supernova. All rights reserved.
+//  Copyright © 2022 Supernova.io. All rights reserved.
 //
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---

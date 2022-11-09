@@ -1,6 +1,5 @@
 node_modules
 build
-test
 dist
 src/**.js
 .idea/*
