@@ -1,5 +1,5 @@
 //
-//  sync-tokens.ts
+//  describe-structure.ts
 //  Supernova CLI
 //
 //  Created by Jiri Trecak.
@@ -10,13 +10,7 @@
 // MARK: - Imports
 
 import { Command, Flags } from "@oclif/core"
-import {
-  Brand,
-  DesignSystem,
-  DesignSystemVersion,
-  Supernova,
-  SupernovaToolsDesignTokensPlugin,
-} from "@supernovaio/supernova-sdk"
+import { DesignSystem, DesignSystemVersion, Supernova, SupernovaToolsDesignTokensPlugin } from "@supernovaio/supernova-sdk"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
@@ -24,9 +18,6 @@ import {
 interface SyncDesignTokensFlags {
   apiKey: string
   designSystemId: string
-  tokenFilePath?: string
-  tokenDirPath?: string
-  configFilePath: string
   dev: boolean
 }
 
@@ -36,7 +27,7 @@ interface SyncDesignTokensFlags {
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Tool implementation
 
-/** Command that handles synchronization with design tokens plugin */
+/** Command that describes the structure of provided design system */
 export class SyncDesignTokens extends Command {
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   // MARK: - Command configuration
@@ -45,27 +36,15 @@ export class SyncDesignTokens extends Command {
   static description = "Synchronize tokens from Figma Tokens plugin to Supernova workspaces"
 
   // Examples how to use the command
-  static examples = [
-    `$ @supernovaio/cli sync-tokens --apiKey="{xxx-xxx-xxx}" --designSystemId={1234} --tokenFilePath "/path/to/tokens.json" --configFilePath "/path/to/config.json"`,
-    `$ @supernovaio/cli sync-tokens --apiKey="{xxx-xxx-xxx}" --designSystemId={1234} --tokenDirPath "/path/to/tokens/" --configFilePath "/path/to/config.json"`,
-  ]
+  static examples = [`$ @supernovaio/cli describe-structure --apiKey="{xxx-xxx-xxx}" --designSystemId="{1234}"`]
 
   // How this command can be run
-  static aliases: ["sync-tokens"]
+  static aliases: ["describe-structure"]
 
   // Static flags to enable / disable features
   static flags = {
     apiKey: Flags.string({ description: "API key to use for accessing Supernova instance", required: true }),
-    designSystemId: Flags.string({ description: "Design System to synchronize contents with", required: true }),
-    tokenFilePath: Flags.string({
-      description: "Path to JSON file containing token definitions",
-      exactlyOne: ["tokenDirPath", "tokenFilePath"],
-    }),
-    tokenDirPath: Flags.string({
-      description: "Path to directory of JSON files containing token definitions",
-      exactlyOne: ["tokenDirPath", "tokenFilePath"],
-    }),
-    configFilePath: Flags.string({ description: "Path to configuration JSON file", required: true, exclusive: [] }),
+    designSystemId: Flags.string({ description: "Design System to describe structure of", required: true }),
     dev: Flags.boolean({ description: "When enabled, CLI will target dev server", hidden: true, default: false }),
   }
 
@@ -80,15 +59,26 @@ export class SyncDesignTokens extends Command {
 
     // Get workspace -> design system –> version
     let connected = await this.getWritableVersion(flags)
-    let dsTool = new SupernovaToolsDesignTokensPlugin(connected.version)
 
-    if (flags.tokenDirPath) {
-      await dsTool.synchronizeTokensFromDirectory(flags.tokenDirPath, flags.configFilePath)
-    } else if (flags.tokenFilePath) {
-      await dsTool.synchronizeTokensFromFile(flags.tokenFilePath, flags.configFilePath)
+    // Get brands and themes
+    let version = connected.version
+    let brands = await version.brands()
+    let themes = await version.themes()
+
+    console.log(`Design system "${connected.designSystem.name}", id: ${connected.designSystem.id} has the following structure:`)
+    console.log(`\n`)
+    for (let brand of brands) {
+        console.log(`Brand: "${brand.name}", id: ${brand.persistentId}`)
+        let brandThemes = themes.filter(t => t.brandId === brand.persistentId)
+        if (brandThemes.length > 0) {
+            for (let theme of brandThemes) {
+                console.log(`  | Theme: "${theme.name}", id: ${theme.id}`)
+            }
+        } else {
+            console.log(`  | No themes defined in this brand`)
+        }
+        console.log("\n")
     }
-
-    this.log(`Tokens synchronized`)
   }
 
   async getWritableVersion(flags: SyncDesignTokensFlags): Promise<{
