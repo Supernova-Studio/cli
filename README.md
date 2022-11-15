@@ -11,7 +11,7 @@ CLI is separated into different commands that you can use to automate certain as
 To install, simply run:
 
 ```bash
-npm install @supernovaio/supernova-sdk
+npm install --save-dev @supernovaio/supernova-sdk
 yarn add --dev @supernovaio/cli
 ```
 
@@ -48,6 +48,7 @@ You can now test that everything was properly set up by running the `supernova` 
 Following is the list of use cases for Supernova CLI. We will be adding more over time, stay tuned!
 
 - [Synchronize Figma Token Plugin data](./docs/figma-tokens-sync.md)
+- [List workspaces, design systems, brands and themes](./docs/list-workspaces.md)
 
 ## Contributions
 
