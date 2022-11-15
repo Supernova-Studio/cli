@@ -43,6 +43,17 @@ You can now test that everything was properly set up by running the `supernova` 
 
 `Node 12.21.0` or newer environment is required to run the Supernova CLI.
 
+### Updating CLI globally
+
+You can update globally installed CLI by running npm update command on the package:
+
+```
+npm update -g @supernovaio/cli
+yarn global upgrade @supernovaio/cli
+```
+
+This will upgrade the CLI to the latest version and make it immediately last default used version.
+
 ## Use cases
 
 Following is the list of use cases for Supernova CLI. We will be adding more over time, stay tuned!
