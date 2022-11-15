@@ -1,4 +1,4 @@
-<img src="https://github.com/Supernova-Studio/sdk-typescript/blob/main/readme-icon.png?raw=true" alt="Supernova SDK" style="max-width:100%; margin-bottom: 20px;" />
+<img src="https://github.com/Supernova-Studio/cli/blob/main/docs/images/cli.png?raw=true" alt="Supernova CLI" style="max-width:100%; margin-bottom: 20px;" />
 
 # Supernova CLI [![All passing](https://img.shields.io/badge/Test-passing-success)]() [![Version 1.0.0](https://img.shields.io/badge/Version-1.0.0-success)]()
 
