@@ -74,8 +74,11 @@
             "sync-tokens": {
                 "description": "Synchronize tokens from Figma Tokens plugin to Supernova workspaces"
             },
-            "describe-structure": {
+            "describe-design-system": {
                 "description": "Describe structure (brands and themes) of selected design system"
+            },
+            "describe-workspaces": {
+                "description": "Describe structure of all workspaces provided API key has access to"
             }
         }
     },

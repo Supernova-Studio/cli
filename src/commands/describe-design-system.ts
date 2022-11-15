@@ -1,5 +1,5 @@
 //
-//  describe-structure.ts
+//  describe-design-system.ts
 //  Supernova CLI
 //
 //  Created by Jiri Trecak.
@@ -33,13 +33,13 @@ export class SyncDesignTokens extends Command {
   // MARK: - Command configuration
 
   // Command help description
-  static description = "Synchronize tokens from Figma Tokens plugin to Supernova workspaces"
+  static description = "Describe structure of single design system by provided ID"
 
   // Examples how to use the command
-  static examples = [`$ @supernovaio/cli describe-structure --apiKey="{xxx-xxx-xxx}" --designSystemId="{1234}"`]
+  static examples = [`$ @supernovaio/cli describe-design-system --apiKey="{xxx-xxx-xxx}" --designSystemId="{1234}"`]
 
   // How this command can be run
-  static aliases: ["describe-structure"]
+  static aliases: ["describe-design-system"]
 
   // Static flags to enable / disable features
   static flags = {
@@ -65,17 +65,17 @@ export class SyncDesignTokens extends Command {
     let brands = await version.brands()
     let themes = await version.themes()
 
-    console.log(`Design system "${connected.designSystem.name}", id: ${connected.designSystem.id} has the following structure:`)
+    console.log(`---  Design system "${connected.designSystem.name}", id: ${connected.designSystem.id}:`)
     console.log(`\n`)
     for (let brand of brands) {
-        console.log(`Brand: "${brand.name}", id: ${brand.persistentId}`)
+        console.log(`  ↳  Brand: "${brand.name}", id: ${brand.persistentId}`)
         let brandThemes = themes.filter(t => t.brandId === brand.persistentId)
         if (brandThemes.length > 0) {
             for (let theme of brandThemes) {
-                console.log(`  | Theme: "${theme.name}", id: ${theme.id}`)
+                console.log(`    ↳  Theme: "${theme.name}", id: ${theme.id}`)
             }
         } else {
-            console.log(`  | No themes defined in this brand`)
+            console.log(`    ↳  No themes defined in this brand`)
         }
         console.log("\n")
     }
