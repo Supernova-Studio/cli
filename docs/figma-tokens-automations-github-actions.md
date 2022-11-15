@@ -38,3 +38,7 @@ jobs:
 ```
 
 Your `run` command will look differently depending on your configuration - follow [configuration tutorial](./figma-tokens-sync.md) to learn more. Once you have your `run` command assembled, commit new GitHub Action to your repository under `.github/workflows` action and each change into token definition will be automatically synchronized with Supernova!
+
+### Examples in action
+
+We have prepared a repository to see the GitHub Actions.. in action (pun intended)! [See it for yourself](https://github.com/JiriTrecak/design-tokens-sync-test).

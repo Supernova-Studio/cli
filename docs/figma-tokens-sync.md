@@ -101,4 +101,10 @@ After you have successfully synced your tokens, you might also want to automate 
 - (coming soon) Automated sync with Azure using Azure Pipelines
 - (coming soon) Automated sync with GitLab using GitLab CI/CD
 
+### Examples in action
+
+We have prepared a repository to see this all put into action! [See it for yourself](https://github.com/JiriTrecak/design-tokens-sync-test).
+
+### Contributing 
+
 If you would like to contribute more tutorials and help people integrate their own pipelines, please open a pull request!
