@@ -41,7 +41,7 @@ You can now test that everything was properly set up by running the `supernova` 
 > @supernovaio/cli/1.x.x ...
 ```
 
-`Node 12.21.0` or newer environment is required to run the Supernova CLI.
+`Node 14` or newer environment is required to run the Supernova CLI.
 
 ### Updating CLI globally
 
