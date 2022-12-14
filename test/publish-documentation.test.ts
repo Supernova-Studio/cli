@@ -29,7 +29,7 @@ describe("publish-documentation", () => {
     .stdout()
     .command(commandAttributes)
     .catch((error) => {
-      console.log(error)
+      throw error
     })
     .it()
 })

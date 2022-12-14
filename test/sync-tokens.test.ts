@@ -32,7 +32,7 @@ describe("sync-tokens-single-file", () => {
     .stdout()
     .command(commandAttributes)
     .catch((error) => {
-      console.log(error)
+      throw error
     })
     .it()
 })
