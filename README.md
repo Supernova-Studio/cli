@@ -1,6 +1,6 @@
 <img src="https://github.com/Supernova-Studio/cli/blob/main/docs/images/cli.png?raw=true" alt="Supernova CLI" style="max-width:100%; margin-bottom: 20px;" />
 
-# Supernova CLI [![All passing](https://img.shields.io/badge/Test-passing-success)]() [![Version 1.0.0](https://img.shields.io/badge/Version-1.0.0-success)]()
+# Supernova CLI [![All passing](https://img.shields.io/badge/Test-passing-success)]() [![CLI Status](https://img.shields.io/badge/CLI%20Status-Beta-blue)]() [![Version 0.9.13](https://img.shields.io/badge/Version-0.9.13-success)]()
 
 The [Supernova](https://supernova.io) CLI enables you to run specific tasks connected with Supernova from your CI/CD pipelines, from your action triggers (GitHub Actions and similar) or from your command line as well. Supernova CLI is powered by a [Supernova SDK](https://github.com/Supernova-Studio/sdk-typescript) that allows access to many more lower-level operations.
 
