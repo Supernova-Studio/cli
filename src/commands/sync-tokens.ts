@@ -17,6 +17,7 @@ import {
   Supernova,
   SupernovaToolsDesignTokensPlugin,
 } from "@supernovaio/supernova-sdk"
+import { FigmaTokensDataLoader } from "../utils/figma-tokens-data-loader"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
@@ -81,11 +82,15 @@ export class SyncDesignTokens extends Command {
     // Get workspace -> design system –> version
     let connected = await this.getWritableVersion(flags)
     let dsTool = new SupernovaToolsDesignTokensPlugin(connected.version)
+    let dataLoader = new FigmaTokensDataLoader()
+    let configDefinition = dataLoader.loadConfigFromPath(flags.configFilePath)
 
     if (flags.tokenDirPath) {
-      await dsTool.synchronizeTokensFromDirectory(flags.tokenDirPath, flags.configFilePath)
+      let tokenDefinition = await dataLoader.loadTokensFromDirectory(flags.tokenDirPath, flags.configFilePath)
+      await dsTool.synchronizeTokensFromData(tokenDefinition, configDefinition.mapping, configDefinition.settings)
     } else if (flags.tokenFilePath) {
-      await dsTool.synchronizeTokensFromFile(flags.tokenFilePath, flags.configFilePath)
+      let tokenDefinition = await dataLoader.loadTokensFromPath(flags.tokenFilePath)
+      await dsTool.synchronizeTokensFromData(tokenDefinition, configDefinition.mapping, configDefinition.settings)
     }
 
     this.log(`Tokens synchronized`)
@@ -125,3 +130,6 @@ export class SyncDesignTokens extends Command {
     }
   }
 }
+
+
+
