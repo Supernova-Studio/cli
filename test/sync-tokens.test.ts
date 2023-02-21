@@ -20,8 +20,8 @@ describe("sync-tokens-single-file", () => {
     "sync-tokens",
     `--apiKey=${process.env.TEST_API_KEY}`,
     `--designSystemId=${process.env.TEST_DB_DESIGN_SYSTEM_ID}`,
-    `--tokenFilePath="${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "tokens.json")}"`,
-    `--configFilePath="${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "supernova.settings.json")}"`,
+    `--tokenFilePath=${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "tokens.json")}`,
+    `--configFilePath=${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "supernova.settings.json")}`,
     `--dev`,
   ]
 
