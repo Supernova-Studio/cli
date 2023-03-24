@@ -59,7 +59,7 @@ export class FigmaTokensDataLoader {
         // Try to load metadata, if any
         let metadataPath = pathToDirectory + '/' + '$metadata.json'
         if (fs.existsSync(metadataPath)) {
-          let metadata = await this.loadObjectFile(themePath)
+          let metadata = await this.loadObjectFile(metadataPath)
           fullStructuredObject['$metadata'] = metadata
         }
   
