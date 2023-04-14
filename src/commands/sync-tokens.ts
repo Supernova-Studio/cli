@@ -10,13 +10,7 @@
 // MARK: - Imports
 
 import { Command, Flags } from "@oclif/core"
-import {
-  Brand,
-  DesignSystem,
-  DesignSystemVersion,
-  Supernova,
-  SupernovaToolsDesignTokensPlugin,
-} from "@supernovaio/supernova-sdk"
+import { Brand, DesignSystem, DesignSystemVersion, Supernova, SupernovaToolsDesignTokensPlugin } from "@supernovaio/supernova-sdk"
 import { FigmaTokensDataLoader } from "../utils/figma-tokens-data-loader"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -29,6 +23,7 @@ interface SyncDesignTokensFlags {
   tokenDirPath?: string
   configFilePath: string
   dev: boolean
+  dry: boolean
 }
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -68,6 +63,12 @@ export class SyncDesignTokens extends Command {
     }),
     configFilePath: Flags.string({ description: "Path to configuration JSON file", required: true, exclusive: [] }),
     dev: Flags.boolean({ description: "When enabled, CLI will target dev server", hidden: true, default: false }),
+    dry: Flags.boolean({
+      description:
+        "When enabled, dry run will be performed and tokens won't write into workspace. This settings overrides settings inside configuration files.",
+      hidden: false,
+      default: false,
+    }),
   }
 
   // Required and optional attributes
@@ -84,13 +85,17 @@ export class SyncDesignTokens extends Command {
     let dsTool = new SupernovaToolsDesignTokensPlugin(connected.version)
     let dataLoader = new FigmaTokensDataLoader()
     let configDefinition = dataLoader.loadConfigFromPath(flags.configFilePath)
+    let settings = configDefinition.settings
+    if (args.dry) {
+      settings.dryRun = true
+    }
 
     if (flags.tokenDirPath) {
       let tokenDefinition = await dataLoader.loadTokensFromDirectory(flags.tokenDirPath, flags.configFilePath)
-      await dsTool.synchronizeTokensFromData(tokenDefinition, configDefinition.mapping, configDefinition.settings)
+      await dsTool.synchronizeTokensFromData(tokenDefinition, configDefinition.mapping, settings)
     } else if (flags.tokenFilePath) {
       let tokenDefinition = await dataLoader.loadTokensFromPath(flags.tokenFilePath)
-      await dsTool.synchronizeTokensFromData(tokenDefinition, configDefinition.mapping, configDefinition.settings)
+      await dsTool.synchronizeTokensFromData(tokenDefinition, configDefinition.mapping, settings)
     }
 
     this.log(`Tokens synchronized`)
@@ -130,6 +135,3 @@ export class SyncDesignTokens extends Command {
     }
   }
 }
-
-
-
