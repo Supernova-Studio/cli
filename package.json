@@ -1,7 +1,7 @@
 {
     "name": "@supernovaio/cli",
     "description": "Supernova.io Command Line Interface",
-    "version": "0.9.22",
+    "version": "0.9.23",
     "author": "Supernova.io",
     "homepage": "https://supernova.io/",
     "keywords": [

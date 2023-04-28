@@ -24,6 +24,7 @@ interface SyncDesignTokensFlags {
   configFilePath: string
   dev: boolean
   dry: boolean
+  apiUrl?: string
 }
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -69,6 +70,7 @@ export class SyncDesignTokens extends Command {
       hidden: false,
       default: false,
     }),
+    apiUrl: Flags.string({ description: "API url to use for accessing Supernova instance, would ignore defaults", hidden: true }),
   }
 
   // Required and optional attributes
@@ -116,7 +118,8 @@ export class SyncDesignTokens extends Command {
 
     // Create instance for prod / dev
     const devAPIhost = "https://dev.api2.supernova.io/api"
-    let sdkInstance = new Supernova(flags.apiKey, flags.dev ? devAPIhost : null, null)
+    const apiUrl = flags.apiUrl && flags.apiUrl.length > 0 ? flags.apiUrl : flags.dev ? devAPIhost : null
+    let sdkInstance = new Supernova(flags.apiKey, apiUrl, null)
 
     let designSystem = await sdkInstance.designSystem(flags.designSystemId)
     if (!designSystem) {
