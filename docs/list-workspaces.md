@@ -30,7 +30,7 @@ You can use the data to help you with [configure Figma Tokens plugin mapping](./
 In many cases, you only really need structure of a single design system. Use different command to focus the log only on a specific design system:
 
 ```sh
-  $ supernova describe-design-system --apiKey="xxx-xxx-xxx" --designSystemId="8751" --dev
+  $ supernova describe-design-system --apiKey="xxx-xxx-xxx" --designSystemId="8751"
 ```
 
 You can obtain design system ID by copying it from the URL on any page of Supernova Cloud. Make sure you have proper design system selected first before copying it:
