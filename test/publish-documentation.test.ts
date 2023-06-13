@@ -19,6 +19,7 @@ describe("publish-documentation", () => {
     "publish-documentation",
     `--apiKey=${process.env.TEST_API_KEY}`,
     `--designSystemId=${process.env.TEST_DB_DESIGN_SYSTEM_ID}`,
+    `--environment=Live`,
     `--dev`,
   ]
 

@@ -46,6 +46,7 @@ export class PublishDocumentation extends Command {
     apiKey: Flags.string({ description: "API key to use for accessing Supernova instance", required: true }),
     designSystemId: Flags.string({ description: "Design System to publish the documentation", required: true }),
     dev: Flags.boolean({ description: "When enabled, CLI will target dev server", hidden: true, default: false }),
+    environment: Flags.string({ description: "Environment to use for publishing: Live or Preview", required: true }),
   }
 
   // Required and optional attributes
@@ -60,7 +61,7 @@ export class PublishDocumentation extends Command {
     // Get workspace -> design system –> version
     let connected = await this.getWritableVersion(flags)
     let documentation = await connected.version.documentation()
-    let result = await documentation.publish()
+    let result = await documentation.publish(flags.environment)
 
     try {
       if (result.status === "Queued") {
