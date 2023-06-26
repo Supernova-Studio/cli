@@ -1,7 +1,7 @@
 {
     "name": "@supernovaio/cli",
     "description": "Supernova.io Command Line Interface",
-    "version": "0.9.27",
+    "version": "0.9.28",
     "author": "Supernova.io",
     "homepage": "https://supernova.io/",
     "keywords": [
@@ -25,7 +25,7 @@
         "@oclif/core": "^1",
         "@oclif/plugin-help": "^5",
         "@oclif/plugin-plugins": "^2.0.1",
-        "@supernovaio/supernova-sdk": "1.8.81",
+        "@supernovaio/supernova-sdk": "1.8.82",
         "chalk": "^5.0.1",
         "node-fetch": "^3.2.4",
         "dotenv": "^16.0.0"
