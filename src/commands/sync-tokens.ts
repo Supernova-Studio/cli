@@ -25,6 +25,7 @@ interface SyncDesignTokensFlags {
   dev: boolean
   dry: boolean
   apiUrl?: string
+  asPlugin?: boolean
 }
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -71,6 +72,7 @@ export class SyncDesignTokens extends Command {
       default: false,
     }),
     apiUrl: Flags.string({ description: "API url to use for accessing Supernova instance, would ignore defaults", hidden: true }),
+    asPlugin: Flags.boolean({ description: "When enabled, CLI will call API to sync tokens, the way Plugin does, with creating data source", hidden: true, default: false }),
   }
 
   // Required and optional attributes
@@ -92,12 +94,28 @@ export class SyncDesignTokens extends Command {
       settings.dryRun = true
     }
 
+    const buildData = (payload: any) => ({
+      connection: { name: "CLI" },
+      ...dataLoader.loadConfigFromPathAsIs(flags.configFilePath),
+      payload
+    })
+
     if (flags.tokenDirPath) {
       let tokenDefinition = await dataLoader.loadTokensFromDirectory(flags.tokenDirPath, flags.configFilePath)
-      await dsTool.synchronizeTokensFromData(tokenDefinition, configDefinition.mapping, settings)
+
+      if (flags.asPlugin) {
+        await connected.version.writer().writeTokenStudioData(buildData(tokenDefinition))
+      } else {
+        await dsTool.synchronizeTokensFromData(tokenDefinition, configDefinition.mapping, settings)
+      }
     } else if (flags.tokenFilePath) {
       let tokenDefinition = await dataLoader.loadTokensFromPath(flags.tokenFilePath)
-      await dsTool.synchronizeTokensFromData(tokenDefinition, configDefinition.mapping, settings)
+
+      if (flags.asPlugin) {
+        await connected.version.writer().writeTokenStudioData(buildData(tokenDefinition))
+      } else {
+        await dsTool.synchronizeTokensFromData(tokenDefinition, configDefinition.mapping, settings)
+      }
     }
 
     this.log(`Tokens synchronized`)
@@ -117,7 +135,14 @@ export class SyncDesignTokens extends Command {
     }
 
     // Create instance for prod / dev
-    const devAPIhost = "https://dev.api2.supernova.io/api"
+    const devAPIhost = "https://dev.api2.supernova.io/api/v2"
+    // After API V2 deploy to PROD, we need to use this URL and set asPlugin by default to true.
+    // We won't get stats logs in CLI after it, just errors. Same way as TS Plugin.
+    // const prodAPIV2host = "https://api.supernova.io/api/v2"
+
+    // We might need to ask people to update CLI before release, so after release all of them use BE call
+    // and do not push old tokens into new model.
+    // We will make a BE v1 bff/import endpoint to error with "Please, update CLI" message.
     const apiUrl = flags.apiUrl && flags.apiUrl.length > 0 ? flags.apiUrl : flags.dev ? devAPIhost : null
     let sdkInstance = new Supernova(flags.apiKey, apiUrl, null)
 
