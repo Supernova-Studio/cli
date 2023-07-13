@@ -10,7 +10,8 @@
 // MARK: - Imports
 
 import { Command, Flags } from "@oclif/core"
-import { Brand, DesignSystem, DesignSystemVersion, Supernova, SupernovaToolsDesignTokensPlugin } from "@supernovaio/supernova-sdk"
+import { DTPluginToSupernovaMapPack, DesignSystem, DesignSystemVersion, Supernova, SupernovaToolsDesignTokensPlugin } from "@supernovaio/supernova-sdk"
+import { Supernova as SupernovaV2, SupernovaToolsDesignTokensPlugin as SupernovaToolsDesignTokensPluginV2, DTPluginToSupernovaMapPack as DTPluginToSupernovaMapPackV2 } from "@supernova-studio/supernova-sdk-beta"
 import { FigmaTokensDataLoader } from "../utils/figma-tokens-data-loader"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -25,6 +26,7 @@ interface SyncDesignTokensFlags {
   dev: boolean
   dry: boolean
   apiUrl?: string
+  apiVersion?: string
 }
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -71,6 +73,7 @@ export class SyncDesignTokens extends Command {
       default: false,
     }),
     apiUrl: Flags.string({ description: "API url to use for accessing Supernova instance, would ignore defaults", hidden: true }),
+    apiVersion: Flags.string({ description: "API version to use, 1 or 2. Flag apiUrl takes precedence if specified", hidden: true, default: undefined }),
   }
 
   // Required and optional attributes
@@ -83,10 +86,10 @@ export class SyncDesignTokens extends Command {
     const { args, flags } = await this.parse(SyncDesignTokens)
 
     // Get workspace -> design system –> version
-    let connected = await this.getWritableVersion(flags)
-    let dsTool = new SupernovaToolsDesignTokensPlugin(connected.version)
+    let dsTool = await this.getDsTool(flags)
     let dataLoader = new FigmaTokensDataLoader()
     let configDefinition = dataLoader.loadConfigFromPath(flags.configFilePath)
+    let mapping = configDefinition.mapping as DTPluginToSupernovaMapPack & DTPluginToSupernovaMapPackV2
     let settings = configDefinition.settings
     if (args.dry) {
       settings.dryRun = true
@@ -94,20 +97,16 @@ export class SyncDesignTokens extends Command {
 
     if (flags.tokenDirPath) {
       let tokenDefinition = await dataLoader.loadTokensFromDirectory(flags.tokenDirPath, flags.configFilePath)
-      await dsTool.synchronizeTokensFromData(tokenDefinition, configDefinition.mapping, settings)
+      await dsTool.synchronizeTokensFromData(tokenDefinition, mapping, settings)
     } else if (flags.tokenFilePath) {
       let tokenDefinition = await dataLoader.loadTokensFromPath(flags.tokenFilePath)
-      await dsTool.synchronizeTokensFromData(tokenDefinition, configDefinition.mapping, settings)
+      await dsTool.synchronizeTokensFromData(tokenDefinition, mapping, settings)
     }
 
     this.log(`Tokens synchronized`)
   }
 
-  async getWritableVersion(flags: SyncDesignTokensFlags): Promise<{
-    instance: Supernova
-    designSystem: DesignSystem
-    version: DesignSystemVersion
-  }> {
+  async getDsTool(flags: SyncDesignTokensFlags) {
     if (!flags.apiKey || flags.apiKey.length === 0) {
       throw new Error(`API key must not be empty`)
     }
@@ -116,8 +115,33 @@ export class SyncDesignTokens extends Command {
       throw new Error(`Design System ID must not be empty`)
     }
 
+    if (flags.apiVersion === '2') {
+      const devAPIhost = "https://dev.api2.supernova.io/api/v2"
+      const prodAPIhost = "https://api.supernova.io/api/v2"
+      const apiUrl = flags.apiUrl && flags.apiUrl.length > 0 ? flags.apiUrl : flags.dev ? devAPIhost : prodAPIhost
+      let sdkInstance = new SupernovaV2(flags.apiKey, apiUrl, null)
+
+      const version = await sdkInstance.versions.getActiveVersion(flags.designSystemId)
+      if (!version) {
+        throw new Error(`Design system  ${flags.designSystemId} writable version not found or not available under provided API key`)
+      }
+
+      let dsTool = new SupernovaToolsDesignTokensPluginV2(version.designSystemId, version.id, sdkInstance)
+      return dsTool
+    } else {
+      let connected = await this.getWritableVersion(flags)
+      let dsTool = new SupernovaToolsDesignTokensPlugin(connected.version)
+      return dsTool
+    }
+  }
+
+  async getWritableVersion(flags: SyncDesignTokensFlags): Promise<{
+    instance: Supernova
+    designSystem: DesignSystem
+    version: DesignSystemVersion
+  }> {
     // Create instance for prod / dev
-    const devAPIhost = "https://dev.api2.supernova.io/api"
+    const devAPIhost = "https://dev.api2.supernova.io/api/v2"
     const apiUrl = flags.apiUrl && flags.apiUrl.length > 0 ? flags.apiUrl : flags.dev ? devAPIhost : null
     let sdkInstance = new Supernova(flags.apiKey, apiUrl, null)
 

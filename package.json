@@ -26,6 +26,7 @@
         "@oclif/plugin-help": "^5",
         "@oclif/plugin-plugins": "^2.0.1",
         "@supernovaio/supernova-sdk": "1.8.79",
+        "@supernova-studio/supernova-sdk-beta": "^1.6.13",
         "chalk": "^5.0.1",
         "node-fetch": "^3.2.4",
         "dotenv": "^16.0.0"
