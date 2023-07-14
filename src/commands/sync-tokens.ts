@@ -10,7 +10,7 @@
 // MARK: - Imports
 
 import { Command, Flags } from "@oclif/core"
-import { Brand, DesignSystem, DesignSystemVersion, Supernova, SupernovaToolsDesignTokensPlugin } from "@supernovaio/supernova-sdk"
+import { DesignSystem, DesignSystemVersion, Supernova, SupernovaToolsDesignTokensPlugin } from "@supernovaio/supernova-sdk"
 import { FigmaTokensDataLoader } from "../utils/figma-tokens-data-loader"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -25,7 +25,6 @@ interface SyncDesignTokensFlags {
   dev: boolean
   dry: boolean
   apiUrl?: string
-  asPlugin?: boolean
 }
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -71,8 +70,7 @@ export class SyncDesignTokens extends Command {
       hidden: false,
       default: false,
     }),
-    apiUrl: Flags.string({ description: "API url to use for accessing Supernova instance, would ignore defaults", hidden: true }),
-    asPlugin: Flags.boolean({ description: "When enabled, CLI will call API to sync tokens, the way Plugin does, with creating data source", hidden: true, default: false }),
+    apiUrl: Flags.string({ description: "API url to use for accessing Supernova instance, would ignore defaults", hidden: true })
   }
 
   // Required and optional attributes
@@ -86,7 +84,6 @@ export class SyncDesignTokens extends Command {
 
     // Get workspace -> design system –> version
     let connected = await this.getWritableVersion(flags)
-    let dsTool = new SupernovaToolsDesignTokensPlugin(connected.version)
     let dataLoader = new FigmaTokensDataLoader()
     let configDefinition = dataLoader.loadConfigFromPath(flags.configFilePath)
     let settings = configDefinition.settings
@@ -100,23 +97,14 @@ export class SyncDesignTokens extends Command {
       payload
     })
 
-    if (flags.tokenDirPath) {
-      let tokenDefinition = await dataLoader.loadTokensFromDirectory(flags.tokenDirPath, flags.configFilePath)
-
-      if (flags.asPlugin) {
-        await connected.version.writer().writeTokenStudioData(buildData(tokenDefinition))
-      } else {
-        await dsTool.synchronizeTokensFromData(tokenDefinition, configDefinition.mapping, settings)
-      }
-    } else if (flags.tokenFilePath) {
-      let tokenDefinition = await dataLoader.loadTokensFromPath(flags.tokenFilePath)
-
-      if (flags.asPlugin) {
-        await connected.version.writer().writeTokenStudioData(buildData(tokenDefinition))
-      } else {
-        await dsTool.synchronizeTokensFromData(tokenDefinition, configDefinition.mapping, settings)
-      }
+    if (!flags.tokenFilePath && !flags.tokenDirPath) {
+      throw new Error(`Either tokenFilePath or tokenDirPath must be provided`)
     }
+
+    let tokenDefinition = flags.tokenDirPath
+      ? await dataLoader.loadTokensFromDirectory(flags.tokenDirPath, flags.configFilePath)
+      : await dataLoader.loadTokensFromPath(flags.tokenFilePath!)
+    await connected.version.writer().writeTokenStudioData(buildData(tokenDefinition))
 
     this.log(`Tokens synchronized`)
   }
@@ -136,7 +124,7 @@ export class SyncDesignTokens extends Command {
 
     // Create instance for prod / dev
     const devAPIhost = "https://dev.api2.supernova.io/api/v2"
-    // After API V2 deploy to PROD, we need to use this URL and set asPlugin by default to true.
+    // After API V2 deploy to PROD, we need to use this URL.
     // We won't get stats logs in CLI after it, just errors. Same way as TS Plugin.
     // const prodAPIV2host = "https://api.supernova.io/api/v2"
 
