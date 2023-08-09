@@ -126,12 +126,12 @@ export class SyncDesignTokens extends Command {
     const devAPIhost = "https://dev.api2.supernova.io/api/v2"
     // After API V2 deploy to PROD, we need to use this URL.
     // We won't get stats logs in CLI after it, just errors. Same way as TS Plugin.
-    // const prodAPIV2host = "https://api.supernova.io/api/v2"
+    const prodAPIV2host = "https://api.supernova.io/api/v2"
 
     // We might need to ask people to update CLI before release, so after release all of them use BE call
     // and do not push old tokens into new model.
     // We will make a BE v1 bff/import endpoint to error with "Please, update CLI" message.
-    const apiUrl = flags.apiUrl && flags.apiUrl.length > 0 ? flags.apiUrl : flags.dev ? devAPIhost : null
+    const apiUrl = flags.apiUrl && flags.apiUrl.length > 0 ? flags.apiUrl : flags.dev ? devAPIhost : prodAPIV2host
     let sdkInstance = new Supernova(flags.apiKey, apiUrl, null)
 
     let designSystem = await sdkInstance.designSystem(flags.designSystemId)
