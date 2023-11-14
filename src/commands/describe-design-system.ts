@@ -3,22 +3,24 @@
 //  Supernova CLI
 //
 //  Created by Jiri Trecak.
-//  Copyright © 2022 Supernova.io. All rights reserved.
+//  Copyright © Supernova.io. All rights reserved.
 //
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Imports
 
 import { Command, Flags } from "@oclif/core"
-import { DesignSystem, DesignSystemVersion, Supernova, SupernovaToolsDesignTokensPlugin } from "@supernovaio/supernova-sdk"
+import { DesignSystem, DesignSystemVersion, Supernova } from "@supernovaio/supernova-sdk"
+import { Environment } from "../types/types"
+import { environmentAPI } from "../utils/network"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
 
-interface SyncDesignTokensFlags {
+interface DescribeDesignSystemFlags {
   apiKey: string
   designSystemId: string
-  dev: boolean
+  environment: string
 }
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -28,7 +30,7 @@ interface SyncDesignTokensFlags {
 // MARK: - Tool implementation
 
 /** Command that describes the structure of provided design system */
-export class SyncDesignTokens extends Command {
+export class DescribeDesignSystem extends Command {
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   // MARK: - Command configuration
 
@@ -45,17 +47,23 @@ export class SyncDesignTokens extends Command {
   static flags = {
     apiKey: Flags.string({ description: "API key to use for accessing Supernova instance", required: true }),
     designSystemId: Flags.string({ description: "Design System to describe structure of", required: true }),
-    dev: Flags.boolean({ description: "When enabled, CLI will target dev server", hidden: true, default: false }),
+    environment: Flags.string({
+      description: "When set, CLI will target a specific environment",
+      hidden: true,
+      required: false,
+      options: Object.values(Environment),
+      default: Environment.production,
+    }),
   }
 
   // Required and optional attributes
-  static args = []
+  static args = {}
 
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   // MARK: - Command runtime
 
   async run(): Promise<void> {
-    const { args, flags } = await this.parse(SyncDesignTokens)
+    const { args, flags } = await this.parse(DescribeDesignSystem)
 
     // Get workspace -> design system –> version
     let connected = await this.getWritableVersion(flags)
@@ -68,20 +76,20 @@ export class SyncDesignTokens extends Command {
     console.log(`---  Design system "${connected.designSystem.name}", id: ${connected.designSystem.id}:`)
     console.log(`\n`)
     for (let brand of brands) {
-        console.log(`  ↳  Brand: "${brand.name}", id: ${brand.persistentId}`)
-        let brandThemes = themes.filter(t => t.brandId === brand.persistentId)
-        if (brandThemes.length > 0) {
-            for (let theme of brandThemes) {
-                console.log(`    ↳  Theme: "${theme.name}", id: ${theme.id}`)
-            }
-        } else {
-            console.log(`    ↳  No themes defined in this brand`)
+      console.log(`  ↳  Brand: "${brand.name}", id: ${brand.persistentId}`)
+      let brandThemes = themes.filter((t) => t.brandId === brand.persistentId)
+      if (brandThemes.length > 0) {
+        for (let theme of brandThemes) {
+          console.log(`    ↳  Theme: "${theme.name}", id: ${theme.id}`)
         }
-        console.log("\n")
+      } else {
+        console.log(`    ↳  No themes defined in this brand`)
+      }
+      console.log("\n")
     }
   }
 
-  async getWritableVersion(flags: SyncDesignTokensFlags): Promise<{
+  async getWritableVersion(flags: DescribeDesignSystemFlags): Promise<{
     instance: Supernova
     designSystem: DesignSystem
     version: DesignSystemVersion
@@ -95,8 +103,7 @@ export class SyncDesignTokens extends Command {
     }
 
     // Create instance for prod / dev
-    const devAPIhost = "https://dev.api2.supernova.io/api"
-    let sdkInstance = new Supernova(flags.apiKey, flags.dev ? devAPIhost : null, null)
+    let sdkInstance = new Supernova(flags.apiKey, environmentAPI(flags.environment as Environment, undefined), null)
 
     let designSystem = await sdkInstance.designSystem(flags.designSystemId)
     if (!designSystem) {

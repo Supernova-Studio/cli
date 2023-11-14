@@ -3,7 +3,7 @@
 //  Supernova CLI
 //
 //  Created by Jiri Trecak.
-//  Copyright © 2022 Supernova.io. All rights reserved.
+//  Copyright © Supernova.io. All rights reserved.
 //
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -11,7 +11,9 @@
 
 import { Command, Flags } from "@oclif/core"
 import { DesignSystem, DesignSystemVersion, Supernova, SupernovaToolsDesignTokensPlugin } from "@supernovaio/supernova-sdk"
+import { Environment } from "../types/types"
 import { FigmaTokensDataLoader } from "../utils/figma-tokens-data-loader"
+import { environmentAPI } from "../utils/network"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
@@ -22,9 +24,9 @@ interface SyncDesignTokensFlags {
   tokenFilePath?: string
   tokenDirPath?: string
   configFilePath: string
-  dev: boolean
   dry: boolean
   apiUrl?: string
+  environment: string
 }
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -70,11 +72,18 @@ export class SyncDesignTokens extends Command {
       hidden: false,
       default: false,
     }),
-    apiUrl: Flags.string({ description: "API url to use for accessing Supernova instance, would ignore defaults", hidden: true })
+    apiUrl: Flags.string({ description: "API url to use for accessing Supernova instance, would ignore defaults", hidden: true }),
+    environment: Flags.string({
+      description: "When set, CLI will target a specific environment",
+      hidden: true,
+      required: false,
+      options: Object.values(Environment),
+      default: Environment.production,
+    }),
   }
 
   // Required and optional attributes
-  static args = []
+  static args = {}
 
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   // MARK: - Command runtime
@@ -87,14 +96,14 @@ export class SyncDesignTokens extends Command {
     let dataLoader = new FigmaTokensDataLoader()
     let configDefinition = dataLoader.loadConfigFromPath(flags.configFilePath)
     let settings = configDefinition.settings
-    if (args.dry) {
+    if (flags.dry) {
       settings.dryRun = true
     }
 
     const buildData = (payload: any) => ({
       connection: { name: "CLI" },
       ...dataLoader.loadConfigFromPathAsIs(flags.configFilePath),
-      payload
+      payload,
     })
 
     if (!flags.tokenFilePath && !flags.tokenDirPath) {
@@ -122,16 +131,10 @@ export class SyncDesignTokens extends Command {
       throw new Error(`Design System ID must not be empty`)
     }
 
-    // Create instance for prod / dev
-    const devAPIhost = "https://dev.api2.supernova.io/api/v2"
-    // After API V2 deploy to PROD, we need to use this URL.
-    // We won't get stats logs in CLI after it, just errors. Same way as TS Plugin.
-    const prodAPIV2host = "https://api.supernova.io/api/v2"
-
     // We might need to ask people to update CLI before release, so after release all of them use BE call
     // and do not push old tokens into new model.
     // We will make a BE v1 bff/import endpoint to error with "Please, update CLI" message.
-    const apiUrl = flags.apiUrl && flags.apiUrl.length > 0 ? flags.apiUrl : flags.dev ? devAPIhost : prodAPIV2host
+    const apiUrl = flags.apiUrl && flags.apiUrl.length > 0 ? flags.apiUrl : environmentAPI(flags.environment as Environment, "v2")
     let sdkInstance = new Supernova(flags.apiKey, apiUrl, null)
 
     let designSystem = await sdkInstance.designSystem(flags.designSystemId)

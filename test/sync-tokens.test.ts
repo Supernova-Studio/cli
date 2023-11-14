@@ -3,7 +3,7 @@
 //  Supernova CLI
 //
 //  Created by Jiri Trecak.
-//  Copyright © 2022 Supernova.io. All rights reserved.
+//  Copyright © Supernova.io. All rights reserved.
 //
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---

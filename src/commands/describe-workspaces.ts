@@ -3,7 +3,7 @@
 //  Supernova CLI
 //
 //  Created by Jiri Trecak.
-//  Copyright © 2022 Supernova.io. All rights reserved.
+//  Copyright © Supernova.io. All rights reserved.
 //
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -11,13 +11,15 @@
 
 import { Command, Flags } from "@oclif/core"
 import { DesignSystem, DesignSystemVersion, Supernova, Workspace } from "@supernovaio/supernova-sdk"
+import { Environment } from "../types/types"
+import { environmentAPI } from "../utils/network"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
 
-interface SyncDesignTokensFlags {
+interface DescribeWorkspacesFlags {
   apiKey: string
-  dev: boolean
+  environment: string
 }
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -27,7 +29,7 @@ interface SyncDesignTokensFlags {
 // MARK: - Tool implementation
 
 /** Command that describes the structure of provided design system */
-export class SyncDesignTokens extends Command {
+export class DescribeWorkspaces extends Command {
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   // MARK: - Command configuration
 
@@ -44,17 +46,23 @@ export class SyncDesignTokens extends Command {
   // Static flags to enable / disable features
   static flags = {
     apiKey: Flags.string({ description: "API key to use for accessing Supernova instance", required: true }),
-    dev: Flags.boolean({ description: "When enabled, CLI will target dev server", hidden: true, default: false }),
+    environment: Flags.string({
+      description: "When set, CLI will target a specific environment",
+      hidden: true,
+      required: false,
+      options: Object.values(Environment),
+      default: Environment.production,
+    }),
   }
 
   // Required and optional attributes
-  static args = []
+  static args = {}
 
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   // MARK: - Command runtime
 
   async run(): Promise<void> {
-    const { args, flags } = await this.parse(SyncDesignTokens)
+    const { args, flags } = await this.parse(DescribeWorkspaces)
 
     // Get workspaces
     let connected = await this.getWorkspaces(flags)
@@ -85,7 +93,7 @@ export class SyncDesignTokens extends Command {
     }
   }
 
-  async getWorkspaces(flags: SyncDesignTokensFlags): Promise<{
+  async getWorkspaces(flags: DescribeWorkspacesFlags): Promise<{
     instance: Supernova
     workspaces: Array<Workspace>
   }> {
@@ -94,8 +102,7 @@ export class SyncDesignTokens extends Command {
     }
 
     // Create instance for prod / dev
-    const devAPIhost = "https://dev.api2.supernova.io/api"
-    let sdkInstance = new Supernova(flags.apiKey, flags.dev ? devAPIhost : null, null)
+    let sdkInstance = new Supernova(flags.apiKey, environmentAPI(flags.environment as Environment, undefined), null)
     let workspaces = await sdkInstance.workspaces()
     return {
       instance: sdkInstance,
