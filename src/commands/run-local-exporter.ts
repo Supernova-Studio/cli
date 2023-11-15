@@ -37,7 +37,6 @@ interface RunLocalExporterFlags {
   brandId?: string
   exporterDir: string
   outputDir: string
-  configPath?: string
   allowOverridingOutput: boolean
   environment: string
 }
@@ -70,11 +69,6 @@ export class RunLocalExporter extends Command {
     designSystemId: Flags.string({ description: "Design System to export from", required: true }),
     exporterDir: Flags.string({ description: "Path to exporter package", required: true }),
     outputDir: Flags.string({ description: "Path to output folder. Must be empty, unless `forceClearOutputDir` is set", required: true }),
-    configPath: Flags.string({
-      description: "Path to config file. When provided, the options set will override the default ones",
-      required: false,
-    }),
-
     themeId: Flags.string({
       description: "Theme to export. Will only be used when exporter has usesThemes: true, and is optional",
       required: false,
