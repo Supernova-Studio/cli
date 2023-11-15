@@ -330,7 +330,7 @@ export class RunLocalExporter extends Command {
       if (message.endsWith('"')) {
         message = message.substring(0, message.length - 1)
       }
-      console.log(`\x1B[1;30m[user]\x1B[0m ${message}`)
+      console.log(`[user]`.gray + message.white)
     }
   }
 }
