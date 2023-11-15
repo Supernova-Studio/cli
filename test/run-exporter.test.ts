@@ -23,7 +23,6 @@ describe("run-local-exporter", function () {
     `--designSystemId=${process.env.TEST_DESIGN_SYSTEM_ID}`,
     `--exporterDir=${path.join(process.cwd(), "test-resources", "exporter")}`,
     `--outputDir=${path.join(process.cwd(), "test-resources", "exporter-output")}`,
-    `--configPath=${path.join(process.cwd(), "test-resources", "exporter", "config.local.json")}`,
     `--environment=${process.env.TEST_ENVIRONMENT}`,
     `--allowOverridingOutput`,
   ]
