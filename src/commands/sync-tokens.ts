@@ -25,7 +25,6 @@ interface SyncDesignTokensFlags {
   tokenFilePath?: string
   tokenDirPath?: string
   configFilePath: string
-  dry: boolean
   apiUrl?: string
   environment: string
 }
@@ -66,13 +65,6 @@ export class SyncDesignTokens extends Command {
       exactlyOne: ["tokenDirPath", "tokenFilePath"],
     }),
     configFilePath: Flags.string({ description: "Path to configuration JSON file", required: true, exclusive: [] }),
-    dev: Flags.boolean({ description: "When enabled, CLI will target dev server", hidden: true, default: false }),
-    dry: Flags.boolean({
-      description:
-        "When enabled, dry run will be performed and tokens won't write into workspace. This settings overrides settings inside configuration files.",
-      hidden: false,
-      default: false,
-    }),
     apiUrl: Flags.string({ description: "API url to use for accessing Supernova instance, would ignore defaults", hidden: true }),
     environment: Flags.string({
       description: "When set, CLI will target a specific environment",
