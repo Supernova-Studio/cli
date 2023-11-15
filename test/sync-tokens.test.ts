@@ -19,10 +19,10 @@ describe("sync-tokens-single-file", () => {
   const commandAttributes = [
     "sync-tokens",
     `--apiKey=${process.env.TEST_API_KEY}`,
-    `--designSystemId=${process.env.TEST_DB_DESIGN_SYSTEM_ID}`,
+    `--designSystemId=${process.env.TEST_DESIGN_SYSTEM_ID}`,
     `--tokenFilePath=${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "tokens.json")}`,
     `--configFilePath=${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "supernova.settings.json")}`,
-    `--dev`,
+    `--environment=${process.env.TEST_ENVIRONMENT}`,
   ]
 
   test
@@ -41,10 +41,10 @@ describe("sync-tokens-single-file-dry", () => {
   const commandAttributes = [
     "sync-tokens",
     `--apiKey=${process.env.TEST_API_KEY}`,
-    `--designSystemId=${process.env.TEST_DB_DESIGN_SYSTEM_ID}`,
+    `--designSystemId=${process.env.TEST_DESIGN_SYSTEM_ID}`,
     `--tokenFilePath=${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "tokens.json")}`,
     `--configFilePath=${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "supernova.settings.json")}`,
-    `--dev`,
+    `--environment=${process.env.TEST_ENVIRONMENT}`,
     `--dry`,
   ]
 

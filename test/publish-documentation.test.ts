@@ -18,8 +18,8 @@ describe("publish-documentation", () => {
   const commandAttributes = [
     "publish-documentation",
     `--apiKey=${process.env.TEST_API_KEY}`,
-    `--designSystemId=${process.env.TEST_DB_DESIGN_SYSTEM_ID}`,
-    `--target=Live`,
+    `--designSystemId=${process.env.TEST_DESIGN_SYSTEM_ID}`,
+    `--target=${process.env.TEST_DOC_ENVIRONMENT}`,
     `--environment=${process.env.TEST_ENVIRONMENT}`,
   ]
 
@@ -30,7 +30,10 @@ describe("publish-documentation", () => {
     .stdout()
     .command(commandAttributes)
     .catch((error) => {
+      console.log("Errored out")
       throw error
     })
-    .it()
+    .it(() => {
+      console.log("Finished")
+    })
 })

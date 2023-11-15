@@ -5,7 +5,6 @@ import { exportConfiguration } from ".."
 export function indexOutputFile(tokens: Array<Token>): OutputTextFile {
   // Generate import statement for every token type there is
   // Filter out files where there are no tokens, if enabled
-  console.log(`Total tokens to index: ${tokens.length}`)
   let content = Object.values(TokenType)
     .map((type) => {
       const importStatement = `@import "./${exportConfiguration.styleFileNames[type]}";`

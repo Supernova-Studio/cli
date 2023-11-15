@@ -6,7 +6,6 @@ import { convertedToken } from "../content/token"
 export function styleOutputFile(type: TokenType, tokens: Array<Token>, tokenGroups: Array<TokenGroup>): OutputTextFile | null {
   // Filter tokens by top level type
   const tokensOfType = tokens.filter((token) => token.tokenType === type)
-  console.log(`Total ${type} tokens to style: ${tokensOfType.length}`)
 
   // Filter out files where there are no tokens, if enabled
   if (!exportConfiguration.generateEmptyFiles && tokensOfType.length === 0) {

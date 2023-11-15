@@ -21,6 +21,10 @@ import { Brand, DesignSystem, DesignSystemVersion, Supernova, TokenTheme } from 
 import { Environment } from "../types/types"
 import { environmentAPI } from "../utils/network"
 import { exportConfiguration } from "../utils/run-exporter/exporter-utils"
+import * as fs from "fs"
+import * as path from "path"
+import axios from "axios"
+import "colors"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
@@ -33,7 +37,7 @@ interface RunLocalExporterFlags {
   exporterDir: string
   outputDir: string
   configPath?: string
-  forceClearOutputDir: boolean
+  allowOverridingOutput: boolean
   environment: string
 }
 
@@ -78,9 +82,9 @@ export class RunLocalExporter extends Command {
       description: "Brand to export. Will only be used when exporter has usesBrands: true, but then it is required to be provided",
       required: false,
     }),
-    forceClearOutputDir: Flags.boolean({
+    allowOverridingOutput: Flags.boolean({
       description:
-        "When enabled, CLI will delete the output folder first, if it exists and then create a new empty one in its place. The exporter can only write into empty folder.",
+        "When enabled, CLI will override output in the output directory if same files where present. When disabled, encountering the same file with throw an error.",
       default: false,
       required: false,
     }),
@@ -102,13 +106,45 @@ export class RunLocalExporter extends Command {
   async run(): Promise<void> {
     const { args, flags } = await this.parse(RunLocalExporter)
 
-    // Get workspace -> design system –> version
-    let connected = await this.getWritableVersion(flags)
+    // Execute exporter
+    try {
+      // Get workspace -> design system –> version
+      let connected = await this.getWritableVersion(flags)
+      const result = await this.executeExporter(flags, connected.version.id)
 
-    // Get brands and themes if needed
-    let version = connected.version
-    let brands = await version.brands()
-    let themes = await version.themes()
+      // Log user logs from the execution
+      // Note this is currently not used because console.log is directly routed to the stdout
+      /*
+      if (flags.log) {
+        for (const log of result.logger.logs) {
+          let message = log.message.trim()
+          if (message.startsWith('"')) {
+            message = message.substring(1)
+          }
+          if (message.endsWith('"')) {
+            message = message.substring(0, message.length - 1)
+          }
+          console.log(`\x1B[1;30m[user]\x1B[0m ${message}`)
+        }
+      }
+      */
+
+      if (result.success) {
+        // Write result to output
+        await this.writeToBuildPath(result.result as PCEngineExporterProcessingResult, flags)
+        console.log("Export finished successfully".green)
+      } else {
+        // Catch write error
+        this.error(`Export failed: ${(result.result as Error).message}`.red, {
+          code: "ERR_EXPORT_FAILED",
+        })
+      }
+    } catch (error: any) {
+      // Catch general export error
+      this.error(`Export failed: ${error.message}`.red, {
+        code: "ERR_EXPORT_FAILED",
+      })
+    }
   }
 
   async getWritableVersion(flags: RunLocalExporterFlags): Promise<{
@@ -173,8 +209,7 @@ export class RunLocalExporter extends Command {
 
   async executeExporter(
     flags: RunLocalExporterFlags,
-    versionId: string,
-    environment: Environment
+    versionId: string
   ): Promise<{
     logger: PLLogger
     result: PCEngineExporterProcessingResult | Error
@@ -194,7 +229,7 @@ export class RunLocalExporter extends Command {
         apiKey: flags.apiKey,
         dsId: flags.designSystemId,
         versionId: versionId,
-        environment: environment,
+        environment: flags.environment as Environment,
         exportPath: flags.exporterDir,
         brandId: flags.brandId,
         themeId: flags.themeId,
@@ -203,20 +238,95 @@ export class RunLocalExporter extends Command {
 
       // Set logo overrides
       let result = await pulsarEngine.executeExporter(config, false)
-
-      // Note: No cleaning! This would remove the local directory of the user that they work on :)
-      // Retrieve result
       return {
         logger: logger,
         result: result,
         success: true,
       }
     } catch (error: any) {
+      // Return error
       return {
         logger: logger,
         result: error,
         success: false,
       }
     }
+  }
+
+  private async writeToBuildPath(result: PCEngineExporterProcessingResult, flags: RunLocalExporterFlags) {
+    // Create build directory if it doesn't exist
+    if (!fs.existsSync(flags.outputDir)) {
+      this.ensureDirectoryExists(flags.outputDir)
+    }
+
+    // Write results to that directory
+    // If overriding is disabled, test every possible file and if it exists, throw an error
+    if (!flags.allowOverridingOutput) {
+      for (const file of result.emittedFiles) {
+        const destination = path.join(flags.outputDir, file.path)
+        if (fs.existsSync(destination)) {
+          throw new Error(
+            `Exporter produced file for destination ${destination} but that file already exists. Enable --allowOverridingOutput option to allow overriding`
+          )
+        }
+      }
+    }
+
+    result.emittedFiles.forEach(async (file) => {
+      let filePath = path.join(flags.outputDir, ...file.path.split("/"))
+      let fileDirectory = path.dirname(filePath)
+      this.ensureDirectoryExists(fileDirectory)
+      if (file.type === "string") {
+        // For string content, write the file content to the destination
+        fs.writeFileSync(filePath, file.content)
+      } else if (file.type === "copy_file") {
+        // For copy commands, copy the file from temporary destination
+        fs.copyFileSync(file.content, filePath)
+      } else if (file.type === "copy_file_remote") {
+        // For remote copy commands, download the file from remote destination
+        await this.downloadFile(file.content, filePath)
+      }
+    })
+  }
+
+  /** Download file from network, if necessary */
+  async downloadFile(fileUrl: string, outputLocationPath: string) {
+    let writer = fs.createWriteStream(outputLocationPath)
+
+    return axios({
+      method: "get",
+      url: fileUrl,
+      responseType: "stream",
+    }).then((response) => {
+      return new Promise((resolve, reject) => {
+        response.data.pipe(writer)
+        let error: any = null
+        writer.on("error", (err) => {
+          error = err
+          writer.close()
+          reject(err)
+        })
+        writer.on("close", () => {
+          if (!error) {
+            resolve(true)
+          }
+        })
+      })
+    })
+  }
+
+  /** Ensure directory exists - if it doesn't create it, recursively */
+  private ensureDirectoryExists(filePath: string, forceLastFragmentIsDirectory: boolean = false) {
+    // If the last fragment of path is forced, even paths without / are treated as dirs
+    if (forceLastFragmentIsDirectory) {
+      if (!filePath.endsWith("/")) {
+        filePath = filePath + "/"
+      }
+    }
+    // Only make directory if it doesn't exist
+    if (fs.existsSync(filePath)) {
+      return
+    }
+    fs.mkdirSync(filePath, { recursive: true })
   }
 }
