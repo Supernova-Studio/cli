@@ -65,27 +65,26 @@ export class DescribeWorkspaces extends Command {
 
       // Get workspaces
       let connected = await this.getWorkspaces(flags)
+      this.log(`\n`)
 
       for (let workspace of connected.workspaces) {
         // Get design systems and log
         let designSystems = await workspace.designSystems()
-        this.log(`\n`)
-        this.log(`---  Workspace "${workspace.name}", handle: "${workspace.handle}":`)
+        this.log(`↳ Workspace "${workspace.name}", handle: "${workspace.handle}", id: ${workspace.id}`.magenta)
         for (let designSystem of designSystems) {
-          this.log(`\n`)
-          this.log(`  ↳  DS "${designSystem.name}", id: ${designSystem.id}:`)
+          this.log(`  ↳ Design system "${designSystem.name}", id: ${designSystem.id}`.cyan)
           let version = await designSystem.activeVersion()
           let brands = await version.brands()
           let themes = await version.themes()
           for (let brand of brands) {
-            this.log(`    ↳  Brand: "${brand.name}", id: ${brand.persistentId}`)
+            this.log(`    ↳ Brand: "${brand.name}", id: ${brand.persistentId}`)
             let brandThemes = themes.filter((t) => t.brandId === brand.persistentId)
             if (brandThemes.length > 0) {
               for (let theme of brandThemes) {
-                this.log(`      ↳ Theme: "${theme.name}", id: ${theme.id}`)
+                this.log(`      ↳ Theme: "${theme.name}", id: ${theme.id}`.gray)
               }
             } else {
-              this.log(`      ↳ No themes defined in this brand`)
+              this.log(`      ↳ No themes defined in this brand`.gray)
             }
           }
         }

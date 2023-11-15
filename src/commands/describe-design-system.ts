@@ -72,19 +72,17 @@ export class DescribeDesignSystem extends Command {
       let brands = await version.brands()
       let themes = await version.themes()
 
-      this.log(`---  Design system "${connected.designSystem.name}", id: ${connected.designSystem.id}:`)
-      this.log(`\n`)
+      this.log(`\n↳ Design system "${connected.designSystem.name}", id: ${connected.designSystem.id}`.cyan)
       for (let brand of brands) {
-        this.log(`  ↳  Brand: "${brand.name}", id: ${brand.persistentId}`)
+        this.log(`  ↳ Brand: "${brand.name}", id: ${brand.persistentId}`)
         let brandThemes = themes.filter((t) => t.brandId === brand.persistentId)
         if (brandThemes.length > 0) {
           for (let theme of brandThemes) {
-            this.log(`    ↳  Theme: "${theme.name}", id: ${theme.id}`)
+            this.log(`    ↳ Theme: "${theme.name}", id: ${theme.id}`)
           }
         } else {
-          this.log(`    ↳  No themes defined in this brand`)
+          this.log(`    ↳ No themes defined in this brand`.gray)
         }
-        this.log("\n")
       }
 
       this.log("\nDone".green)
