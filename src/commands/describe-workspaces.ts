@@ -10,9 +10,10 @@
 // MARK: - Imports
 
 import { Command, Flags } from "@oclif/core"
-import { DesignSystem, DesignSystemVersion, Supernova, Workspace } from "@supernovaio/supernova-sdk"
-import { Environment } from "../types/types"
+import { Supernova, Workspace } from "@supernovaio/supernova-sdk"
+import { Environment, ErrorCode } from "../types/types"
 import { environmentAPI } from "../utils/network"
+import "colors"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
@@ -55,41 +56,46 @@ export class DescribeWorkspaces extends Command {
     }),
   }
 
-  // Required and optional attributes
-  static args = {}
-
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   // MARK: - Command runtime
 
   async run(): Promise<void> {
-    const { args, flags } = await this.parse(DescribeWorkspaces)
+    try {
+      const { flags } = await this.parse(DescribeWorkspaces)
 
-    // Get workspaces
-    let connected = await this.getWorkspaces(flags)
+      // Get workspaces
+      let connected = await this.getWorkspaces(flags)
 
-    for (let workspace of connected.workspaces) {
-      // Get design systems and log
-      let designSystems = await workspace.designSystems()
-      console.log(`\n`)
-      console.log(`---  Workspace "${workspace.name}", handle: "${workspace.handle}":`)
-      for (let designSystem of designSystems) {
-        console.log(`\n`)
-        console.log(`  ↳  DS "${designSystem.name}", id: ${designSystem.id}:`)
-        let version = await designSystem.activeVersion()
-        let brands = await version.brands()
-        let themes = await version.themes()
-        for (let brand of brands) {
-          console.log(`    ↳  Brand: "${brand.name}", id: ${brand.persistentId}`)
-          let brandThemes = themes.filter((t) => t.brandId === brand.persistentId)
-          if (brandThemes.length > 0) {
-            for (let theme of brandThemes) {
-              console.log(`      ↳ Theme: "${theme.name}", id: ${theme.id}`)
+      for (let workspace of connected.workspaces) {
+        // Get design systems and log
+        let designSystems = await workspace.designSystems()
+        this.log(`\n`)
+        this.log(`---  Workspace "${workspace.name}", handle: "${workspace.handle}":`)
+        for (let designSystem of designSystems) {
+          this.log(`\n`)
+          this.log(`  ↳  DS "${designSystem.name}", id: ${designSystem.id}:`)
+          let version = await designSystem.activeVersion()
+          let brands = await version.brands()
+          let themes = await version.themes()
+          for (let brand of brands) {
+            this.log(`    ↳  Brand: "${brand.name}", id: ${brand.persistentId}`)
+            let brandThemes = themes.filter((t) => t.brandId === brand.persistentId)
+            if (brandThemes.length > 0) {
+              for (let theme of brandThemes) {
+                this.log(`      ↳ Theme: "${theme.name}", id: ${theme.id}`)
+              }
+            } else {
+              this.log(`      ↳ No themes defined in this brand`)
             }
-          } else {
-            console.log(`      ↳ No themes defined in this brand`)
           }
         }
       }
+      this.log("\nDone".green)
+    } catch (error) {
+      // Catch general error
+      this.error(`Workspace description failed: ${error}`.red, {
+        code: ErrorCode.workspaceDescriptionFailed,
+      })
     }
   }
 

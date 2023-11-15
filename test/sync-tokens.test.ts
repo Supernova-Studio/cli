@@ -15,7 +15,8 @@ import * as path from "path"
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Tests
 
-describe("sync-tokens-single-file", () => {
+describe("sync-tokens-single-file", function () {
+  this.timeout(30000)
   const commandAttributes = [
     "sync-tokens",
     `--apiKey=${process.env.TEST_API_KEY}`,
@@ -27,17 +28,14 @@ describe("sync-tokens-single-file", () => {
 
   test
     .do((ctx) => {
-      console.log(commandAttributes.join(" "))
+      console.log(commandAttributes.join(" \\\n  "))
     })
-    .stdout()
     .command(commandAttributes)
-    .catch((error) => {
-      throw error
-    })
     .it()
 })
 
-describe("sync-tokens-single-file-dry", () => {
+describe("sync-tokens-single-file-dry", function () {
+  this.timeout(30000)
   const commandAttributes = [
     "sync-tokens",
     `--apiKey=${process.env.TEST_API_KEY}`,
@@ -50,12 +48,8 @@ describe("sync-tokens-single-file-dry", () => {
 
   test
     .do((ctx) => {
-      console.log(commandAttributes.join(" "))
+      console.log(commandAttributes.join(" \\\n  "))
     })
-    .stdout()
     .command(commandAttributes)
-    .catch((error) => {
-      throw error
-    })
     .it()
 })

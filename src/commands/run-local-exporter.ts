@@ -98,14 +98,11 @@ export class RunLocalExporter extends Command {
     }),
   }
 
-  // Required and optional attributes
-  static args = {}
-
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   // MARK: - Command runtime
 
   async run(): Promise<void> {
-    const { args, flags } = await this.parse(RunLocalExporter)
+    const { flags } = await this.parse(RunLocalExporter)
 
     // Execute exporter
     try {
@@ -122,7 +119,7 @@ export class RunLocalExporter extends Command {
       if (result.success) {
         // Write result to output
         await this.writeToBuildPath(result.result as PCEngineExporterProcessingResult, flags)
-        console.log("Export finished successfully".green)
+        this.log("Export finished successfully".green)
       } else {
         // Catch write error
         this.error(`Export failed: ${(result.result as Error).message}`.red, {

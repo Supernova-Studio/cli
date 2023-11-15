@@ -2051,10 +2051,10 @@
   resolved "https://registry.npmjs.org/@supercharge/promise-pool/-/promise-pool-2.4.0.tgz"
   integrity sha512-O9CMipBlq5OObdt1uKJGIzm9cdjpPWfj+a+Zw9EgWKxaMNHKC7EU7X9taj3H0EGQNLOSq2jAcOa3EzxlfHsD6w==
 
-"@supernova-studio/pulsar-core@2.0.11":
-  version "2.0.11"
-  resolved "https://registry.npmjs.org/@supernova-studio/pulsar-core/-/pulsar-core-2.0.11.tgz"
-  integrity sha512-/jwxSierIeND2kUwYtrwtL6l9riS7tb1tjDWsCMIFe92m5rx6LDgHl2n2oPI4L+2oCCeeOQk/ULwhe9s5qvqOA==
+"@supernova-studio/pulsar-core@2.0.12":
+  version "2.0.12"
+  resolved "https://registry.npmjs.org/@supernova-studio/pulsar-core/-/pulsar-core-2.0.12.tgz"
+  integrity sha512-zisuzY5fEHUJ9E/89VuZrckj0EoGoe+zJBz5o4W3wuK7JUl7aMgWrUEkxxXNpOco8MvyKeE5G87b5P9RCxfrDA==
   dependencies:
     "@jsep-plugin/object" "1.2.1"
     "@jsep-plugin/ternary" "1.1.3"

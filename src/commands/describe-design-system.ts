@@ -11,8 +11,9 @@
 
 import { Command, Flags } from "@oclif/core"
 import { DesignSystem, DesignSystemVersion, Supernova } from "@supernovaio/supernova-sdk"
-import { Environment } from "../types/types"
+import { Environment, ErrorCode } from "../types/types"
 import { environmentAPI } from "../utils/network"
+import "colors"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
@@ -56,36 +57,42 @@ export class DescribeDesignSystem extends Command {
     }),
   }
 
-  // Required and optional attributes
-  static args = {}
-
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   // MARK: - Command runtime
 
   async run(): Promise<void> {
-    const { args, flags } = await this.parse(DescribeDesignSystem)
+    try {
+      const { flags } = await this.parse(DescribeDesignSystem)
 
-    // Get workspace -> design system –> version
-    let connected = await this.getWritableVersion(flags)
+      // Get workspace -> design system –> version
+      let connected = await this.getWritableVersion(flags)
 
-    // Get brands and themes
-    let version = connected.version
-    let brands = await version.brands()
-    let themes = await version.themes()
+      // Get brands and themes
+      let version = connected.version
+      let brands = await version.brands()
+      let themes = await version.themes()
 
-    console.log(`---  Design system "${connected.designSystem.name}", id: ${connected.designSystem.id}:`)
-    console.log(`\n`)
-    for (let brand of brands) {
-      console.log(`  ↳  Brand: "${brand.name}", id: ${brand.persistentId}`)
-      let brandThemes = themes.filter((t) => t.brandId === brand.persistentId)
-      if (brandThemes.length > 0) {
-        for (let theme of brandThemes) {
-          console.log(`    ↳  Theme: "${theme.name}", id: ${theme.id}`)
+      this.log(`---  Design system "${connected.designSystem.name}", id: ${connected.designSystem.id}:`)
+      this.log(`\n`)
+      for (let brand of brands) {
+        this.log(`  ↳  Brand: "${brand.name}", id: ${brand.persistentId}`)
+        let brandThemes = themes.filter((t) => t.brandId === brand.persistentId)
+        if (brandThemes.length > 0) {
+          for (let theme of brandThemes) {
+            this.log(`    ↳  Theme: "${theme.name}", id: ${theme.id}`)
+          }
+        } else {
+          this.log(`    ↳  No themes defined in this brand`)
         }
-      } else {
-        console.log(`    ↳  No themes defined in this brand`)
+        this.log("\n")
       }
-      console.log("\n")
+
+      this.log("\nDone".green)
+    } catch (error) {
+      // Catch general error
+      this.error(`Design system description failed: ${error}`.red, {
+        code: ErrorCode.designSystemDescriptionFailed,
+      })
     }
   }
 

@@ -11,9 +11,10 @@
 
 import { Command, Flags } from "@oclif/core"
 import { DesignSystem, DesignSystemVersion, Supernova, SupernovaToolsDesignTokensPlugin } from "@supernovaio/supernova-sdk"
-import { Environment } from "../types/types"
+import { Environment, ErrorCode } from "../types/types"
 import { FigmaTokensDataLoader } from "../utils/figma-tokens-data-loader"
 import { environmentAPI } from "../utils/network"
+import "colors"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
@@ -82,40 +83,53 @@ export class SyncDesignTokens extends Command {
     }),
   }
 
-  // Required and optional attributes
-  static args = {}
-
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   // MARK: - Command runtime
 
   async run(): Promise<void> {
-    const { args, flags } = await this.parse(SyncDesignTokens)
+    try {
+      const { flags } = await this.parse(SyncDesignTokens)
 
-    // Get workspace -> design system –> version
-    let connected = await this.getWritableVersion(flags)
-    let dataLoader = new FigmaTokensDataLoader()
-    let configDefinition = dataLoader.loadConfigFromPath(flags.configFilePath)
-    let settings = configDefinition.settings
-    if (flags.dry) {
-      settings.dryRun = true
+      // Get workspace -> design system –> version
+      let connected = await this.getWritableVersion(flags)
+      let dataLoader = new FigmaTokensDataLoader()
+      let configDefinition = dataLoader.loadConfigFromPath(flags.configFilePath)
+      let settings = configDefinition.settings
+      if (flags.dry) {
+        settings.dryRun = true
+      }
+
+      const buildData = (payload: any) => ({
+        connection: { name: "CLI" },
+        ...dataLoader.loadConfigFromPathAsIs(flags.configFilePath),
+        payload,
+      })
+
+      if (!flags.tokenFilePath && !flags.tokenDirPath) {
+        throw new Error(`Either tokenFilePath or tokenDirPath must be provided`)
+      }
+
+      let tokenDefinition = flags.tokenDirPath
+        ? await dataLoader.loadTokensFromDirectory(flags.tokenDirPath, flags.configFilePath)
+        : await dataLoader.loadTokensFromPath(flags.tokenFilePath!)
+      await connected.version.writer().writeTokenStudioData(buildData(tokenDefinition))
+
+      this.log(`\nTokens synchronized`.green)
+    } catch (error: any) {
+      // Catch general export error
+      let errorMessage: string | undefined = undefined
+      try {
+        // Add readable server log, if present as object
+        const parsedMessage = JSON.parse(error.message)
+        this.log(parsedMessage)
+      } catch {
+        errorMessage = error.message
+      }
+
+      this.error(`Token sync failed${errorMessage ? `: ${errorMessage}` : ""}`.red, {
+        code: ErrorCode.tokenSyncFailed,
+      })
     }
-
-    const buildData = (payload: any) => ({
-      connection: { name: "CLI" },
-      ...dataLoader.loadConfigFromPathAsIs(flags.configFilePath),
-      payload,
-    })
-
-    if (!flags.tokenFilePath && !flags.tokenDirPath) {
-      throw new Error(`Either tokenFilePath or tokenDirPath must be provided`)
-    }
-
-    let tokenDefinition = flags.tokenDirPath
-      ? await dataLoader.loadTokensFromDirectory(flags.tokenDirPath, flags.configFilePath)
-      : await dataLoader.loadTokensFromPath(flags.tokenFilePath!)
-    await connected.version.writer().writeTokenStudioData(buildData(tokenDefinition))
-
-    this.log(`Tokens synchronized`)
   }
 
   async getWritableVersion(flags: SyncDesignTokensFlags): Promise<{

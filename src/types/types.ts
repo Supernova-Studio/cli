@@ -33,3 +33,11 @@ export enum Environment {
   staging = "staging",
   demo = "demo",
 }
+
+export enum ErrorCode {
+  exportFailed = "ERR_EXPORT_FAILED",
+  tokenSyncFailed = "ERR_TOKEN_SYNC_FAILED",
+  designSystemDescriptionFailed = "ERR_DESIGN_SYSTEM_DESCRIPTION_FAILED",
+  workspaceDescriptionFailed = "ERR_WORKSPACE_DESCRIPTION_FAILED",
+  documentationPublishingFailed = "ERR_DOCUMENTATION_PUBLISHING_FAILED",
+}

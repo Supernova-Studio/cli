@@ -14,7 +14,8 @@ import { test } from "@oclif/test"
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Tests
 
-describe("publish-documentation", () => {
+describe("publish-documentation", function () {
+  this.timeout(10000)
   const commandAttributes = [
     "publish-documentation",
     `--apiKey=${process.env.TEST_API_KEY}`,
@@ -25,15 +26,8 @@ describe("publish-documentation", () => {
 
   test
     .do((ctx) => {
-      console.log(commandAttributes.join(" "))
+      console.log(commandAttributes.join(" \\\n  "))
     })
-    .stdout()
     .command(commandAttributes)
-    .catch((error) => {
-      console.log("Errored out")
-      throw error
-    })
-    .it(() => {
-      console.log("Finished")
-    })
+    .it()
 })

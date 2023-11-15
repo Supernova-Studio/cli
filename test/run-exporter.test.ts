@@ -25,8 +25,7 @@ describe("run-local-exporter", function () {
     `--outputDir=${path.join(process.cwd(), "test-resources", "exporter-output")}`,
     `--configPath=${path.join(process.cwd(), "test-resources", "exporter", "config.local.json")}`,
     `--environment=${process.env.TEST_ENVIRONMENT}`,
-    // `--allowOverridingOutput`,
-    // `--log`,
+    `--allowOverridingOutput`,
   ]
 
   if (process.env.TEST_THEME_ID) {

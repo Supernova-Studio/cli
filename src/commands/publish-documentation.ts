@@ -12,8 +12,9 @@
 import { Command, Flags } from "@oclif/core"
 import { DesignSystem, DesignSystemVersion, Supernova, SupernovaToolsDesignTokensPlugin } from "@supernovaio/supernova-sdk"
 import { DocumentationEnvironment } from "@supernovaio/supernova-sdk/build/Typescript/src/model/enums/SDKDocumentationEnvironment"
-import { Environment } from "../types/types"
+import { Environment, ErrorCode } from "../types/types"
 import { environmentAPI } from "../utils/network"
+import "colors"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
@@ -60,30 +61,30 @@ export class PublishDocumentation extends Command {
     }),
   }
 
-  // Required and optional attributes
-  static args = {}
-
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   // MARK: - Command runtime
 
   async run(): Promise<void> {
-    const { args, flags } = await this.parse(PublishDocumentation)
-
-    // Get workspace -> design system –> version
-    let connected = await this.getWritableVersion(flags)
-    let documentation = await connected.version.documentation()
-    let result = await documentation.publish(flags.target as DocumentationEnvironment)
-
     try {
+      const { flags } = await this.parse(PublishDocumentation)
+
+      // Get workspace -> design system –> version
+      let connected = await this.getWritableVersion(flags)
+      let documentation = await connected.version.documentation()
+      let result = await documentation.publish(flags.target as DocumentationEnvironment)
+
       if (result.status === "Queued") {
-        console.log("Documentation queued for publishing")
+        this.log("\nDone: Documentation queued for publishing".green)
       } else if (result.status === "InProgress") {
-        console.log("Skipped documentation publish as another build is already in progress")
+        this.log("\n Done: Skipped documentation publish as another build is already in progress".green)
       } else if (result.status === "Failure") {
-        console.log("Unknown error: Documentation not published")
+        throw new Error(`Documentation publish failed with unknown failure`)
       }
     } catch (error) {
-      throw error
+      // Catch general error
+      this.error(`Publishing documentation failed: ${error}`.red, {
+        code: ErrorCode.documentationPublishingFailed,
+      })
     }
   }
 
