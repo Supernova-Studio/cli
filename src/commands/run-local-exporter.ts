@@ -16,6 +16,7 @@ import {
   PCExporterEnvironment,
   PCEngineExporterProcessingResult,
   PLLogger,
+  PCEngineFileDescriptor,
 } from "@supernova-studio/pulsar-core"
 import { Brand, DesignSystem, DesignSystemVersion, Supernova, TokenTheme } from "@supernovaio/supernova-sdk"
 import { Environment } from "../types/types"
@@ -113,21 +114,10 @@ export class RunLocalExporter extends Command {
       const result = await this.executeExporter(flags, connected.version.id)
 
       // Log user logs from the execution
-      // Note this is currently not used because console.log is directly routed to the stdout
-      /*
+      // Note this is currently not used because console.log is directly routed to the stdout and we have no control over it. Pulsar must be updated before this is doable
       if (flags.log) {
-        for (const log of result.logger.logs) {
-          let message = log.message.trim()
-          if (message.startsWith('"')) {
-            message = message.substring(1)
-          }
-          if (message.endsWith('"')) {
-            message = message.substring(0, message.length - 1)
-          }
-          console.log(`\x1B[1;30m[user]\x1B[0m ${message}`)
-        }
+        this.logRun(flags, result.logger)
       }
-      */
 
       if (result.success) {
         // Write result to output
@@ -254,12 +244,11 @@ export class RunLocalExporter extends Command {
   }
 
   private async writeToBuildPath(result: PCEngineExporterProcessingResult, flags: RunLocalExporterFlags) {
-    // Create build directory if it doesn't exist
+    // Create build directory if it doesn't exist, otherwise keep as it is. It should never be deleted!
     if (!fs.existsSync(flags.outputDir)) {
       this.ensureDirectoryExists(flags.outputDir)
     }
 
-    // Write results to that directory
     // If overriding is disabled, test every possible file and if it exists, throw an error
     if (!flags.allowOverridingOutput) {
       for (const file of result.emittedFiles) {
@@ -272,47 +261,48 @@ export class RunLocalExporter extends Command {
       }
     }
 
-    result.emittedFiles.forEach(async (file) => {
+    // Temporary structure to hold file contents
+    const filesToWrite: { filePath: string; content: string | Buffer }[] = []
+
+    // Function to process a single file
+    const processFile = async (file: PCEngineFileDescriptor) => {
       let filePath = path.join(flags.outputDir, ...file.path.split("/"))
       let fileDirectory = path.dirname(filePath)
       this.ensureDirectoryExists(fileDirectory)
+
       if (file.type === "string") {
-        // For string content, write the file content to the destination
-        fs.writeFileSync(filePath, file.content)
+        filesToWrite.push({ filePath, content: file.content })
       } else if (file.type === "copy_file") {
-        // For copy commands, copy the file from temporary destination
-        fs.copyFileSync(file.content, filePath)
+        const fileContent = fs.readFileSync(file.content)
+        filesToWrite.push({ filePath, content: fileContent })
       } else if (file.type === "copy_file_remote") {
-        // For remote copy commands, download the file from remote destination
-        await this.downloadFile(file.content, filePath)
+        const fileContent = await this.downloadFileToMemory(file.content)
+        filesToWrite.push({ filePath, content: fileContent })
       }
+    }
+
+    // Process all files in chunks to speed up the process
+    const chunkSize = 4
+    for (let i = 0; i < result.emittedFiles.length; i += chunkSize) {
+      const chunk = result.emittedFiles.slice(i, i + chunkSize)
+      await Promise.all(chunk.map((file) => processFile(file)))
+    }
+
+    // Write all files from the temporary structure to the filesystem as a final step - this is to avoid partial writes
+    filesToWrite.forEach(({ filePath, content }) => {
+      fs.writeFileSync(filePath, content)
     })
   }
 
-  /** Download file from network, if necessary */
-  async downloadFile(fileUrl: string, outputLocationPath: string) {
-    let writer = fs.createWriteStream(outputLocationPath)
-
-    return axios({
+  /** Download file into memory using Axios */
+  private async downloadFileToMemory(fileUrl: string): Promise<Buffer> {
+    const response = await axios({
       method: "get",
       url: fileUrl,
-      responseType: "stream",
-    }).then((response) => {
-      return new Promise((resolve, reject) => {
-        response.data.pipe(writer)
-        let error: any = null
-        writer.on("error", (err) => {
-          error = err
-          writer.close()
-          reject(err)
-        })
-        writer.on("close", () => {
-          if (!error) {
-            resolve(true)
-          }
-        })
-      })
+      responseType: "arraybuffer",
     })
+
+    return Buffer.from(response.data)
   }
 
   /** Ensure directory exists - if it doesn't create it, recursively */
@@ -328,5 +318,19 @@ export class RunLocalExporter extends Command {
       return
     }
     fs.mkdirSync(filePath, { recursive: true })
+  }
+
+  /** Log run to output */
+  private logRun(flags: RunLocalExporterFlags, logger: PLLogger) {
+    for (const log of logger.logs) {
+      let message = log.message.trim()
+      if (message.startsWith('"')) {
+        message = message.substring(1)
+      }
+      if (message.endsWith('"')) {
+        message = message.substring(0, message.length - 1)
+      }
+      console.log(`\x1B[1;30m[user]\x1B[0m ${message}`)
+    }
   }
 }

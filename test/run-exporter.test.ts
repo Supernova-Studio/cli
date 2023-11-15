@@ -38,7 +38,7 @@ describe("run-local-exporter", function () {
 
   test
     .do((ctx) => {
-      console.log(commandAttributes.join(" "))
+      console.log(commandAttributes.join(" \\\n  "))
     })
     .command(commandAttributes)
     .it()
