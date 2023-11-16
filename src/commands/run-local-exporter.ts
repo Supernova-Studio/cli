@@ -57,7 +57,15 @@ export class RunLocalExporter extends Command {
 
   // Examples how to use the command
   static examples = [
-    `$ @supernovaio/cli run-local-exporter --apiKey="{xxx-xxx-xxx}" --designSystemId="{1234}" --themeId="{1234}" --brandId="{1234}" --exporterDir="{./path/to/exporter/dir}" --outputDir="{./path/to/output/dir}"`,
+    `$ @supernovaio/cli run-local-exporter \
+      --apiKey="[API_KEY]" \
+      --designSystemId="[DESIGN_SYSTEM_ID]" \
+      --themeId="[THEME_ID]" \
+      --brandId="[BRAND_ID]" \
+      --exporterDir="[./path/to/exporter/dir]" \
+      --outputDir="[./path/to/output/dir]" \
+      --allowOverridingOutput
+    `,
   ]
 
   // How this command can be run
