@@ -26,7 +26,7 @@
         "@oclif/plugin-help": "6.0.6",
         "@oclif/plugin-plugins": "4.1.7",
         "@supernova-studio/pulsar-core": "2.0.12",
-        "@supernovaio/supernova-sdk": "1.9.3",
+        "@supernovaio/supernova-sdk": "1.9.5",
         "axios": "^1.6.2",
         "chalk": "^5.0.1",
         "colors": "^1.4.0",
