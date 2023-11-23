@@ -1,7 +1,7 @@
 {
     "name": "@supernovaio/cli",
     "description": "Supernova.io Command Line Interface",
-    "version": "0.9.29",
+    "version": "1.0.0",
     "author": "Supernova.io",
     "homepage": "https://supernova.io/",
     "keywords": [
@@ -22,18 +22,25 @@
     },
     "bugs": "https://github.com/Supernova-Studio/cli/issues",
     "dependencies": {
-        "@oclif/core": "^1",
-        "@oclif/plugin-help": "^5",
-        "@oclif/plugin-plugins": "^2.0.1",
-        "@supernovaio/supernova-sdk": "1.8.79",
+        "@oclif/core": "3.11.0",
+        "@oclif/plugin-help": "6.0.6",
+        "@oclif/plugin-plugins": "4.1.7",
+        "@supernova-studio/pulsar-core": "2.0.12",
+        "@supernovaio/supernova-sdk": "1.9.5",
+        "axios": "^1.6.2",
         "chalk": "^5.0.1",
-        "node-fetch": "^3.2.4",
-        "dotenv": "^16.0.0"
+        "colors": "^1.4.0",
+        "dotenv": "^16.0.0",
+        "node-fetch": "^3.2.4"
     },
     "devDependencies": {
+        "@babel/core": "^7.9.0",
+        "@babel/preset-env": "^7.3.4",
+        "@babel/preset-react": "7.18.6",
         "@babel/register": "^7.18.9",
-        "@oclif/test": "^2",
+        "@oclif/test": "3.1.2",
         "@types/chai": "^4",
+        "@types/colors": "^1.2.1",
         "@types/mocha": "^9.0.0",
         "@types/node": "^16.11.36",
         "chai": "^4",
@@ -42,14 +49,11 @@
         "eslint-config-oclif-typescript": "^1.0.2",
         "globby": "^11",
         "mocha": "^9",
-        "oclif": "^3",
+        "oclif": "4.0.3",
         "shx": "^0.3.3",
-        "ts-node": "^10.2.1",
+        "ts-node": "10.9.1",
         "tslib": "^2.3.1",
-        "typescript": "^4.4.3",
-        "@babel/core": "^7.9.0",
-        "@babel/preset-env": "^7.3.4",
-        "@babel/preset-react": "7.18.6"
+        "typescript": "5.2.2"
     },
     "engines": {
         "node": ">=12.0.0"
@@ -81,7 +85,10 @@
                 "description": "Describe structure of all workspaces provided API key has access to"
             },
             "publish-documentation": {
-                "description": "Publish current documentation draft from the CLI"
+                "description": "Publish current documentation"
+            },
+            "run-local-exporter": {
+                "description": "Run exporer package locally"
             }
         }
     },
@@ -90,9 +97,8 @@
         "build": "shx rm -rf dist && tsc -b",
         "lint": "eslint . --ext .ts --config .eslintrc",
         "postpack": "shx rm -f oclif.manifest.json",
-        "posttest": "yarn lint",
         "prepack": "yarn build && oclif manifest",
-        "test": "npm run build && env TS_NODE_PROJECT=\"tsconfig.testing.json\" mocha --require ts-node/register --forbid-only \"test/**/*.test.ts\"",
+        "test": "DEBUG=* && npm run build && env TS_NODE_PROJECT=\"tsconfig.testing.json\" mocha --require ts-node/register --forbid-only \"test/**/*.test.ts\"",
         "publish-package": "npm run build && npm run prepack && npm publish --access public && npm run postpack"
     },
     "types": "dist/index.d.ts"

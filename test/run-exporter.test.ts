@@ -1,5 +1,5 @@
 //
-//  sync-tokens.test.ts
+//  run-exporter.test.ts
 //  Supernova CLI
 //
 //  Created by Jiri Trecak.
@@ -15,16 +15,24 @@ import * as path from "path"
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Tests
 
-describe("sync-tokens-single-file", function () {
-  this.timeout(30000)
-  const commandAttributes = [
-    "sync-tokens",
+describe("run-local-exporter", function () {
+  this.timeout(10000)
+  let commandAttributes = [
+    "run-local-exporter",
     `--apiKey=${process.env.TEST_API_KEY}`,
-    `--designSystemId=${process.env.TEST_SYNC_DESIGN_SYSTEM_ID}`,
-    `--tokenFilePath=${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "tokens.json")}`,
-    `--configFilePath=${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "supernova.settings.json")}`,
+    `--designSystemId=${process.env.TEST_DESIGN_SYSTEM_ID}`,
+    `--exporterDir=${path.join(process.cwd(), "test-resources", "exporter")}`,
+    `--outputDir=${path.join(process.cwd(), "test-resources", "exporter-output")}`,
     `--environment=${process.env.TEST_ENVIRONMENT}`,
+    `--allowOverridingOutput`,
   ]
+
+  if (process.env.TEST_THEME_ID) {
+    commandAttributes.push(`--themeId=${process.env.TEST_THEME_ID}`)
+  }
+  if (process.env.TEST_BRAND_ID) {
+    commandAttributes.push(`--brandId=${process.env.TEST_BRAND_ID}`)
+  }
 
   test
     .do((ctx) => {

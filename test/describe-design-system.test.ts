@@ -15,14 +15,12 @@ import * as path from "path"
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Tests
 
-describe("sync-tokens-single-file", function () {
+describe("describe-design-system", function () {
   this.timeout(30000)
   const commandAttributes = [
-    "sync-tokens",
+    "describe-design-system",
     `--apiKey=${process.env.TEST_API_KEY}`,
-    `--designSystemId=${process.env.TEST_SYNC_DESIGN_SYSTEM_ID}`,
-    `--tokenFilePath=${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "tokens.json")}`,
-    `--configFilePath=${path.join(process.cwd(), "test-resources", "figma-tokens", "single-file-sync", "supernova.settings.json")}`,
+    `--designSystemId=${process.env.TEST_DESIGN_SYSTEM_ID}`,
     `--environment=${process.env.TEST_ENVIRONMENT}`,
   ]
 

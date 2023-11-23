@@ -3,21 +3,24 @@
 //  Supernova CLI
 //
 //  Created by Jiri Trecak.
-//  Copyright © 2022 Supernova.io. All rights reserved.
+//  Copyright © Supernova.io. All rights reserved.
 //
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Imports
 
 import { Command, Flags } from "@oclif/core"
-import { DesignSystem, DesignSystemVersion, Supernova, Workspace } from "@supernovaio/supernova-sdk"
+import { Supernova, Workspace } from "@supernovaio/supernova-sdk"
+import { Environment, ErrorCode } from "../types/types"
+import { environmentAPI } from "../utils/network"
+import "colors"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
 
-interface SyncDesignTokensFlags {
+interface DescribeWorkspacesFlags {
   apiKey: string
-  dev: boolean
+  environment: string
 }
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -27,7 +30,7 @@ interface SyncDesignTokensFlags {
 // MARK: - Tool implementation
 
 /** Command that describes the structure of provided design system */
-export class SyncDesignTokens extends Command {
+export class DescribeWorkspaces extends Command {
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   // MARK: - Command configuration
 
@@ -44,48 +47,58 @@ export class SyncDesignTokens extends Command {
   // Static flags to enable / disable features
   static flags = {
     apiKey: Flags.string({ description: "API key to use for accessing Supernova instance", required: true }),
-    dev: Flags.boolean({ description: "When enabled, CLI will target dev server", hidden: true, default: false }),
+    environment: Flags.string({
+      description: "When set, CLI will target a specific environment",
+      hidden: true,
+      required: false,
+      options: Object.values(Environment),
+      default: Environment.production,
+    }),
   }
-
-  // Required and optional attributes
-  static args = []
 
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   // MARK: - Command runtime
 
   async run(): Promise<void> {
-    const { args, flags } = await this.parse(SyncDesignTokens)
+    try {
+      const { flags } = await this.parse(DescribeWorkspaces)
 
-    // Get workspaces
-    let connected = await this.getWorkspaces(flags)
+      // Get workspaces
+      let connected = await this.getWorkspaces(flags)
+      this.log(`\n`)
 
-    for (let workspace of connected.workspaces) {
-      // Get design systems and log
-      let designSystems = await workspace.designSystems()
-      console.log(`\n`)
-      console.log(`---  Workspace "${workspace.name}", handle: "${workspace.handle}":`)
-      for (let designSystem of designSystems) {
-        console.log(`\n`)
-        console.log(`  ↳  DS "${designSystem.name}", id: ${designSystem.id}:`)
-        let version = await designSystem.activeVersion()
-        let brands = await version.brands()
-        let themes = await version.themes()
-        for (let brand of brands) {
-          console.log(`    ↳  Brand: "${brand.name}", id: ${brand.persistentId}`)
-          let brandThemes = themes.filter((t) => t.brandId === brand.persistentId)
-          if (brandThemes.length > 0) {
-            for (let theme of brandThemes) {
-              console.log(`      ↳ Theme: "${theme.name}", id: ${theme.id}`)
+      for (let workspace of connected.workspaces) {
+        // Get design systems and log
+        let designSystems = await workspace.designSystems()
+        this.log(`↳ Workspace "${workspace.name}", handle: "${workspace.handle}", id: ${workspace.id}`.magenta)
+        for (let designSystem of designSystems) {
+          this.log(`  ↳ Design system "${designSystem.name}", id: ${designSystem.id}`.cyan)
+          let version = await designSystem.activeVersion()
+          let brands = await version.brands()
+          let themes = await version.themes()
+          for (let brand of brands) {
+            this.log(`    ↳ Brand: "${brand.name}", id: ${brand.persistentId}`)
+            let brandThemes = themes.filter((t) => t.brandId === brand.persistentId)
+            if (brandThemes.length > 0) {
+              for (let theme of brandThemes) {
+                this.log(`      ↳ Theme: "${theme.name}", id: ${theme.id}`.gray)
+              }
+            } else {
+              this.log(`      ↳ No themes defined in this brand`.gray)
             }
-          } else {
-            console.log(`      ↳ No themes defined in this brand`)
           }
         }
       }
+      this.log("\nDone".green)
+    } catch (error) {
+      // Catch general error
+      this.error(`Workspace description failed: ${error}`.red, {
+        code: ErrorCode.workspaceDescriptionFailed,
+      })
     }
   }
 
-  async getWorkspaces(flags: SyncDesignTokensFlags): Promise<{
+  async getWorkspaces(flags: DescribeWorkspacesFlags): Promise<{
     instance: Supernova
     workspaces: Array<Workspace>
   }> {
@@ -94,8 +107,7 @@ export class SyncDesignTokens extends Command {
     }
 
     // Create instance for prod / dev
-    const devAPIhost = "https://dev.api2.supernova.io/api"
-    let sdkInstance = new Supernova(flags.apiKey, flags.dev ? devAPIhost : null, null)
+    let sdkInstance = new Supernova(flags.apiKey, environmentAPI(flags.environment as Environment, undefined), null)
     let workspaces = await sdkInstance.workspaces()
     return {
       instance: sdkInstance,

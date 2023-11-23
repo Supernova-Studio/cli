@@ -3,7 +3,7 @@
 //  Supernova CLI
 //
 //  Created by Jiri Trecak.
-//  Copyright © 2022 Supernova.io. All rights reserved.
+//  Copyright © Supernova.io. All rights reserved.
 //
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -11,7 +11,10 @@
 
 import { Command, Flags } from "@oclif/core"
 import { DesignSystem, DesignSystemVersion, Supernova, SupernovaToolsDesignTokensPlugin } from "@supernovaio/supernova-sdk"
+import { Environment, ErrorCode } from "../types/types"
 import { FigmaTokensDataLoader } from "../utils/figma-tokens-data-loader"
+import { environmentAPI } from "../utils/network"
+import "colors"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
@@ -22,9 +25,8 @@ interface SyncDesignTokensFlags {
   tokenFilePath?: string
   tokenDirPath?: string
   configFilePath: string
-  dev: boolean
-  dry: boolean
   apiUrl?: string
+  environment: string
 }
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -63,50 +65,68 @@ export class SyncDesignTokens extends Command {
       exactlyOne: ["tokenDirPath", "tokenFilePath"],
     }),
     configFilePath: Flags.string({ description: "Path to configuration JSON file", required: true, exclusive: [] }),
-    dev: Flags.boolean({ description: "When enabled, CLI will target dev server", hidden: true, default: false }),
-    dry: Flags.boolean({
-      description:
-        "When enabled, dry run will be performed and tokens won't write into workspace. This settings overrides settings inside configuration files.",
-      hidden: false,
-      default: false,
+    apiUrl: Flags.string({ description: "API url to use for accessing Supernova instance, would ignore defaults", hidden: true }),
+    environment: Flags.string({
+      description: "When set, CLI will target a specific environment",
+      hidden: true,
+      required: false,
+      options: Object.values(Environment),
+      default: Environment.production,
     }),
-    apiUrl: Flags.string({ description: "API url to use for accessing Supernova instance, would ignore defaults", hidden: true })
   }
-
-  // Required and optional attributes
-  static args = []
 
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   // MARK: - Command runtime
 
   async run(): Promise<void> {
-    const { args, flags } = await this.parse(SyncDesignTokens)
+    try {
+      const { flags } = await this.parse(SyncDesignTokens)
 
-    // Get workspace -> design system –> version
-    let connected = await this.getWritableVersion(flags)
-    let dataLoader = new FigmaTokensDataLoader()
-    let configDefinition = dataLoader.loadConfigFromPath(flags.configFilePath)
-    let settings = configDefinition.settings
-    if (args.dry) {
-      settings.dryRun = true
+      // Get workspace -> design system –> version
+      let connected = await this.getWritableVersion(flags)
+      let dataLoader = new FigmaTokensDataLoader()
+      let configDefinition = dataLoader.loadConfigFromPath(flags.configFilePath)
+      let settings = configDefinition.settings
+      if (flags.dry) {
+        settings.dryRun = true
+      }
+
+      const buildData = (payload: any) => ({
+        connection: { name: "CLI" },
+        ...dataLoader.loadConfigFromPathAsIs(flags.configFilePath),
+        payload,
+      })
+
+      if (!flags.tokenFilePath && !flags.tokenDirPath) {
+        throw new Error(`Either tokenFilePath or tokenDirPath must be provided`)
+      }
+
+      let tokenDefinition = flags.tokenDirPath
+        ? await dataLoader.loadTokensFromDirectory(flags.tokenDirPath, flags.configFilePath)
+        : await dataLoader.loadTokensFromPath(flags.tokenFilePath!)
+      const response = await connected.version.writer().writeTokenStudioData(buildData(tokenDefinition)) as any
+      if (response?.result?.logs && response.result.logs.length > 0) {
+        for (const log of response.result.logs) {
+          this.log(log)
+        }
+      }
+
+      this.log(`\nTokens synchronized`.green)
+    } catch (error: any) {
+      // Catch general export error
+      let errorMessage: string | undefined = undefined
+      try {
+        // Add readable server log, if present as object
+        const parsedMessage = JSON.parse(error.message)
+        this.log(parsedMessage)
+      } catch {
+        errorMessage = error.message
+      }
+
+      this.error(`Token sync failed${errorMessage ? `: ${errorMessage}` : ""}`.red, {
+        code: ErrorCode.tokenSyncFailed,
+      })
     }
-
-    const buildData = (payload: any) => ({
-      connection: { name: "CLI" },
-      ...dataLoader.loadConfigFromPathAsIs(flags.configFilePath),
-      payload
-    })
-
-    if (!flags.tokenFilePath && !flags.tokenDirPath) {
-      throw new Error(`Either tokenFilePath or tokenDirPath must be provided`)
-    }
-
-    let tokenDefinition = flags.tokenDirPath
-      ? await dataLoader.loadTokensFromDirectory(flags.tokenDirPath, flags.configFilePath)
-      : await dataLoader.loadTokensFromPath(flags.tokenFilePath!)
-    await connected.version.writer().writeTokenStudioData(buildData(tokenDefinition))
-
-    this.log(`Tokens synchronized`)
   }
 
   async getWritableVersion(flags: SyncDesignTokensFlags): Promise<{
@@ -122,16 +142,10 @@ export class SyncDesignTokens extends Command {
       throw new Error(`Design System ID must not be empty`)
     }
 
-    // Create instance for prod / dev
-    const devAPIhost = "https://dev.api2.supernova.io/api/v2"
-    // After API V2 deploy to PROD, we need to use this URL.
-    // We won't get stats logs in CLI after it, just errors. Same way as TS Plugin.
-    const prodAPIV2host = "https://api.supernova.io/api/v2"
-
     // We might need to ask people to update CLI before release, so after release all of them use BE call
     // and do not push old tokens into new model.
     // We will make a BE v1 bff/import endpoint to error with "Please, update CLI" message.
-    const apiUrl = flags.apiUrl && flags.apiUrl.length > 0 ? flags.apiUrl : flags.dev ? devAPIhost : prodAPIV2host
+    const apiUrl = flags.apiUrl && flags.apiUrl.length > 0 ? flags.apiUrl : environmentAPI(flags.environment as Environment, "v2")
     let sdkInstance = new Supernova(flags.apiKey, apiUrl, null)
 
     let designSystem = await sdkInstance.designSystem(flags.designSystemId)
