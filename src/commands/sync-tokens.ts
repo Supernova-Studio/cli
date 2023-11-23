@@ -104,7 +104,12 @@ export class SyncDesignTokens extends Command {
       let tokenDefinition = flags.tokenDirPath
         ? await dataLoader.loadTokensFromDirectory(flags.tokenDirPath, flags.configFilePath)
         : await dataLoader.loadTokensFromPath(flags.tokenFilePath!)
-      await connected.version.writer().writeTokenStudioData(buildData(tokenDefinition))
+      const response = await connected.version.writer().writeTokenStudioData(buildData(tokenDefinition)) as any
+      if (response?.result?.logs && response.result.logs.length > 0) {
+        for (const log of response.result.logs) {
+          this.log(log)
+        }
+      }
 
       this.log(`\nTokens synchronized`.green)
     } catch (error: any) {
