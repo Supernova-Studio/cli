@@ -1,7 +1,7 @@
 {
     "name": "@supernovaio/cli",
     "description": "Supernova.io Command Line Interface",
-    "version": "1.0.0",
+    "version": "0.8.2",
     "author": "Supernova.io",
     "homepage": "https://supernova.io/",
     "keywords": [
@@ -33,6 +33,10 @@
         "dotenv": "^16.0.0",
         "node-fetch": "^3.2.4"
     },
+    "bundleDependencies": [
+        "@supernova-studio/pulsar-core",
+        "@supernova-studio/simple-parse-github-url"
+    ],
     "devDependencies": {
         "@babel/core": "^7.9.0",
         "@babel/preset-env": "^7.3.4",
@@ -50,10 +54,15 @@
         "globby": "^11",
         "mocha": "^9",
         "oclif": "4.0.3",
+        "replace-in-file-webpack-plugin": "^1.0.6",
         "shx": "^0.3.3",
+        "terser-webpack-plugin": "^5.3.9",
         "ts-node": "10.9.1",
         "tslib": "^2.3.1",
-        "typescript": "5.2.2"
+        "typescript": "5.2.2",
+        "webpack": "^5.89.0",
+        "webpack-bundle-analyzer": "^4.10.1",
+        "webpack-cli": "^5.1.4"
     },
     "engines": {
         "node": ">=12.0.0"
@@ -98,6 +107,7 @@
         "lint": "eslint . --ext .ts --config .eslintrc",
         "postpack": "shx rm -f oclif.manifest.json",
         "prepack": "yarn build && oclif manifest",
+        "webpack": "webpack --config webpack.config.js",
         "test": "DEBUG=* && npm run build && env TS_NODE_PROJECT=\"tsconfig.testing.json\" mocha --require ts-node/register --forbid-only \"test/**/*.test.ts\"",
         "publish-package": "npm run build && npm run prepack && npm publish --access public && npm run postpack"
     },
