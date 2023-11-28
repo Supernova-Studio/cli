@@ -64,3 +64,10 @@ jobs:
           name: exporter-output
           path: ${{ github.workspace }}/test-resources/exporter-output
           retention-days: 5
+      
+      - name: Assert list of exported files
+        uses: GuillaumeFalourd/assert-command-line-output@v2.2
+        with:
+          command_line: cd ${{ github.workspace }}/test-resources/exporter-output && ls -R
+          assert_file_path: ${{ github.workspace }}/test-resources/exporter-output-files.txt
+          expected_result: PASSED
