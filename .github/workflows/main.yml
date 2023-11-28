@@ -68,6 +68,6 @@ jobs:
       - name: Assert list of exported files
         uses: GuillaumeFalourd/assert-command-line-output@v2.2
         with:
-          command_line: cd ${{ github.workspace }}/test-resources/exporter-output && ls -R
+          command_line: ls ${{ github.workspace }}/test-resources/exporter-output -R
           assert_file_path: ${{ github.workspace }}/test-resources/exporter-output-files.txt
           expected_result: PASSED
