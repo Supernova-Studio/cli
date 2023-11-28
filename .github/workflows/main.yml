@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  # push:
+  #   branches: [ main ]
+  pull_request:
+    branches:
+      - "main"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+         
+      - name: Install Supernova CLI dependency
+        run: npm install --g @supernovaio/cli
+
+      - name: Check Supernova version
+        run: supernova --version
+
+      - name: Synchronize tokens with Supernova 
+        run: >
+          supernova sync-tokens 
+          --apiKey="sn.xQVWs9YIyhy7ixEL5skJmtLhA8FPgW9hrHO1B7aV2r8V59k8XRHs37vjWEeSiT3jVTSy7lsxU8NtQUXin91VLmdLMM9KhsHG"
+          --designSystemId="105994" 
+          --tokenFilePath="${{ github.workspace }}/test-resources/figma-tokens/single-file-sync/tokens.json" 
+          --configFilePath="${{ github.workspace }}/test-resources/figma-tokens/single-file-sync/supernova.settings.json"
+
+      - name: Build local exporter
+        run: cd ${{ github.workspace }}/test-resources/exporter && npm i && npm run build
+
+      - name: Run local exporter with Supernova 
+        run: >
+          supernova run-local-exporter
+          --apiKey="sn.xQVWs9YIyhy7ixEL5skJmtLhA8FPgW9hrHO1B7aV2r8V59k8XRHs37vjWEeSiT3jVTSy7lsxU8NtQUXin91VLmdLMM9KhsHG"
+          --designSystemId="105994" 
+          --brandId="69a8187b-f3d3-4b0f-a892-90afe6a92dcc"
+          --exporterDir="${{ github.workspace }}/test-resources/exporter" 
+          --outputDir="${{ github.workspace }}/test-resources/exporter-output"
+          --allowOverridingOutput
+      
+      - name: Archive exporter artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: exporter-output
+          path: ${{ github.workspace }}/test-resources/exporter-output
+          retention-days: 5

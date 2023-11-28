@@ -1,7 +1,7 @@
 {
     "name": "@supernovaio/cli",
     "description": "Supernova.io Command Line Interface",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "author": "Supernova.io",
     "homepage": "https://supernova.io/",
     "keywords": [
@@ -33,6 +33,10 @@
         "dotenv": "^16.0.0",
         "node-fetch": "^3.2.4"
     },
+    "bundleDependencies": [
+        "@supernova-studio/pulsar-core",
+        "@supernova-studio/simple-parse-github-url"
+    ],
     "devDependencies": {
         "@babel/core": "^7.9.0",
         "@babel/preset-env": "^7.3.4",
