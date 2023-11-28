@@ -1,0 +1,54 @@
+name: Build & Test
+
+on:
+    # push:
+    #   branches: [ main ]
+    pull_request:
+        branches:
+            - "main"
+    workflow_dispatch:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        env:
+            TEST_API_URL: https://api.dev.supernova.io/api/v2
+            TEST_API_KEY: ${{ secrets.SN_API_KEY_DEV }}
+            TEST_ENVIRONMENT: development
+            TEST_DOC_ENVIRONMENT: Live
+            TEST_DESIGN_SYSTEM_ID: 3644
+            TEST_SYNC_DESIGN_SYSTEM_ID: 3644
+            TEST_BRAND_ID: acf822d2-c315-4897-b875-d5b00654b057
+
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: lts/Hydrogen
+
+            - name: Cache node modules
+              id: cache-npm
+              uses: actions/cache@v3
+              env:
+                  cache-name: cache-node-modules
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+
+            - name: Authenticate with private NPM package
+              run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN_READ }}" > ~/.npmrc
+
+            - name: Install dependencies
+              run: npm i
+
+            - name: Build
+              run: npm run build
+
+            - name: Test
+              run: npm run test
