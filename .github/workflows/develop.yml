@@ -1,4 +1,4 @@
-name: CI @ develop environment
+name: CI@develop
 
 on:
   # push:
@@ -44,6 +44,7 @@ jobs:
           --designSystemId="3644" 
           --tokenFilePath="${{ github.workspace }}/test-resources/figma-tokens/single-file-sync/tokens.json" 
           --configFilePath="${{ github.workspace }}/test-resources/figma-tokens/single-file-sync/supernova.settings.json"
+          --environment=development
 
       - name: Build local exporter
         run: cd ${{ github.workspace }}/test-resources/exporter && npm i && npm run build
@@ -57,6 +58,7 @@ jobs:
           --exporterDir="${{ github.workspace }}/test-resources/exporter" 
           --outputDir="${{ github.workspace }}/test-resources/exporter-output"
           --allowOverridingOutput
+          --environment=development
       
       - name: Archive exporter artifacts
         uses: actions/upload-artifact@v3
