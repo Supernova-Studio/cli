@@ -40,21 +40,21 @@ jobs:
       - name: Describe design system
         run: >
           supernova describe-design-system
-          --apiKey="${{ secrets.SN_API_KEY_PROD }}"
-          --designSystemId="105994"
+          --apiKey="${{ secrets.SN_API_KEY_DEV }}"
+          --designSystemId="3644"
           --environment=development
 
       - name: Describe workspaces
         run: >
           supernova describe-workspaces
-          --apiKey="${{ secrets.SN_API_KEY_PROD }}"
+          --apiKey="${{ secrets.SN_API_KEY_DEV }}"
           --environment=development
 
       - name: Publish documentation
         run: >
           supernova publish-documentation
-          --apiKey="${{ secrets.SN_API_KEY_PROD }}"
-          --designSystemId="105994"
+          --apiKey="${{ secrets.SN_API_KEY_DEV }}"
+          --designSystemId="3644"
           --environment=development
 
       - name: Synchronize tokens with Supernova 
