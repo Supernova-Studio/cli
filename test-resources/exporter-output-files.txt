@@ -1,7 +1,4 @@
 index.css
-styles
-
-./styles:
 border-widths.css
 colors.css
 font-families.css

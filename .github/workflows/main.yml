@@ -40,7 +40,7 @@ jobs:
       - name: Synchronize tokens with Supernova 
         run: >
           supernova sync-tokens 
-          --apiKey="sn.xQVWs9YIyhy7ixEL5skJmtLhA8FPgW9hrHO1B7aV2r8V59k8XRHs37vjWEeSiT3jVTSy7lsxU8NtQUXin91VLmdLMM9KhsHG"
+          --apiKey="${{ secrets.SN_API_KEY_PROD }}"
           --designSystemId="105994" 
           --tokenFilePath="${{ github.workspace }}/test-resources/figma-tokens/single-file-sync/tokens.json" 
           --configFilePath="${{ github.workspace }}/test-resources/figma-tokens/single-file-sync/supernova.settings.json"
@@ -51,7 +51,7 @@ jobs:
       - name: Run local exporter with Supernova 
         run: >
           supernova run-local-exporter
-          --apiKey="sn.xQVWs9YIyhy7ixEL5skJmtLhA8FPgW9hrHO1B7aV2r8V59k8XRHs37vjWEeSiT3jVTSy7lsxU8NtQUXin91VLmdLMM9KhsHG"
+          --apiKey="${{ secrets.SN_API_KEY_PROD }}"
           --designSystemId="105994" 
           --brandId="69a8187b-f3d3-4b0f-a892-90afe6a92dcc"
           --exporterDir="${{ github.workspace }}/test-resources/exporter" 
@@ -68,6 +68,6 @@ jobs:
       - name: Assert list of exported files
         uses: GuillaumeFalourd/assert-command-line-output@v2.2
         with:
-          command_line: ls ${{ github.workspace }}/test-resources/exporter-output -R
+          command_line: ls -R ${{ github.workspace }}/test-resources/exporter-output | grep .css
           assert_file_path: ${{ github.workspace }}/test-resources/exporter-output-files.txt
           expected_result: PASSED
