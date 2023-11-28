@@ -37,6 +37,26 @@ jobs:
       - name: Check Supernova version
         run: supernova --version
 
+      - name: Describe design system
+        run: >
+          supernova describe-design-system
+          --apiKey="${{ secrets.SN_API_KEY_PROD }}"
+          --designSystemId="105994"
+          --environment=development
+
+      - name: Describe workspaces
+        run: >
+          supernova describe-workspaces
+          --apiKey="${{ secrets.SN_API_KEY_PROD }}"
+          --environment=development
+
+      - name: Publish documentation
+        run: >
+          supernova publish-documentation
+          --apiKey="${{ secrets.SN_API_KEY_PROD }}"
+          --designSystemId="105994"
+          --environment=development
+
       - name: Synchronize tokens with Supernova 
         run: >
           supernova sync-tokens 
