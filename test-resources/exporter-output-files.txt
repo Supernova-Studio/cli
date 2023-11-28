@@ -12,5 +12,6 @@ line-heights.css
 opacities.css
 paragraph-spacings.css
 radii.css
+sizes.css
 spaces.css
 typography.css
