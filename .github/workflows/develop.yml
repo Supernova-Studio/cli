@@ -1,0 +1,103 @@
+name: Install CLI @develop
+
+on:
+  # push:
+  #   branches: [ main ]
+  pull_request:
+    branches:
+      - "main"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/Hydrogen
+
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Ensure there is no .nprmc with tokens
+        uses: GuillaumeFalourd/assert-command-line-output@v2.2
+        with:
+          command_line: cat ~/.npmrc
+          assert_file_path: ${{ github.workspace }}/test-resources/discard.txt
+          expected_result: PASSED
+
+      - name: Install Supernova CLI dependency
+        run: npm install --g @supernovaio/cli
+
+      - name: Check Supernova version
+        run: supernova --version
+
+      - name: Describe design system
+        run: >
+          supernova describe-design-system
+          --apiKey="${{ secrets.SN_API_KEY_DEV }}"
+          --designSystemId="3644"
+          --environment=development
+
+      - name: Describe workspaces
+        run: >
+          supernova describe-workspaces
+          --apiKey="${{ secrets.SN_API_KEY_DEV }}"
+          --environment=development
+
+      - name: Publish documentation
+        run: >
+          supernova publish-documentation
+          --apiKey="${{ secrets.SN_API_KEY_DEV }}"
+          --designSystemId="3644"
+          --environment=development
+
+      - name: Synchronize tokens with Supernova 
+        run: >
+          supernova sync-tokens 
+          --apiKey="${{ secrets.SN_API_KEY_DEV }}"
+          --designSystemId="3644" 
+          --tokenFilePath="${{ github.workspace }}/test-resources/figma-tokens/single-file-sync/tokens.json" 
+          --configFilePath="${{ github.workspace }}/test-resources/figma-tokens/single-file-sync/supernova.settings.json"
+          --environment=development
+
+      - name: Build local exporter
+        run: cd ${{ github.workspace }}/test-resources/exporter && npm i && npm run build
+
+      - name: Run local exporter with Supernova 
+        run: >
+          supernova run-local-exporter
+          --apiKey="${{ secrets.SN_API_KEY_DEV }}"
+          --designSystemId="3644" 
+          --brandId="acf822d2-c315-4897-b875-d5b00654b057"
+          --exporterDir="${{ github.workspace }}/test-resources/exporter" 
+          --outputDir="${{ github.workspace }}/test-resources/exporter-output"
+          --allowOverridingOutput
+          --environment=development
+      
+      - name: Archive exporter artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: exporter-output
+          path: ${{ github.workspace }}/test-resources/exporter-output
+          retention-days: 5
+      
+      - name: Assert list of exported files
+        uses: GuillaumeFalourd/assert-command-line-output@v2.2
+        with:
+          command_line: ls -R ${{ github.workspace }}/test-resources/exporter-output | grep .css
+          assert_file_path: ${{ github.workspace }}/test-resources/exporter-output-files.txt
+          expected_result: PASSED
