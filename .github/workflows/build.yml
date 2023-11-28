@@ -17,9 +17,9 @@ jobs:
             TEST_API_KEY: ${{ secrets.SN_API_KEY_DEV }}
             TEST_ENVIRONMENT: development
             TEST_DOC_ENVIRONMENT: Live
-            TEST_DESIGN_SYSTEM_ID: 3644
-            TEST_SYNC_DESIGN_SYSTEM_ID: 3644
-            TEST_BRAND_ID: acf822d2-c315-4897-b875-d5b00654b057
+            TEST_DESIGN_SYSTEM_ID: 3646
+            TEST_SYNC_DESIGN_SYSTEM_ID: 3646
+            TEST_BRAND_ID: c6c7a475-164f-4a27-a273-c7f8b12a726e
 
         steps:
             - uses: actions/checkout@v3
@@ -40,6 +40,9 @@ jobs:
                       ${{ runner.os }}-build-${{ env.cache-name }}-
                       ${{ runner.os }}-build-
                       ${{ runner.os }}-
+
+            - name: Build local exporter
+              run: cd ${{ github.workspace }}/test-resources/exporter && npm i && npm run build && cd ${{ github.workspace }}
 
             - name: Authenticate with private NPM package
               run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN_READ }}" > ~/.npmrc

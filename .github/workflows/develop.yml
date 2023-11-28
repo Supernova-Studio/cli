@@ -31,7 +31,14 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-         
+
+      - name: Ensure there is no .nprmc with tokens
+        uses: GuillaumeFalourd/assert-command-line-output@v2.2
+        with:
+          command_line: cat ~/.npmrc
+          assert_file_path: ${{ github.workspace }}/test-resources/discard.txt
+          expected_result: PASSED
+
       - name: Install Supernova CLI dependency
         run: npm install --g @supernovaio/cli
 
