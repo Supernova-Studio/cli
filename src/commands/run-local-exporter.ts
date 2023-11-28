@@ -15,9 +15,9 @@ import {
   PCPulsarExporterMode,
   PCExporterEnvironment,
   PCEngineExporterProcessingResult,
-  PLLogger,
   PCEngineFileDescriptor,
 } from "@supernova-studio/pulsar-core"
+import { PLLogger } from "@supernova-studio/pulsar-language"
 import { Brand, DesignSystem, DesignSystemVersion, Supernova, TokenTheme } from "@supernovaio/supernova-sdk"
 import { Environment } from "../types/types"
 import { environmentAPI } from "../utils/network"

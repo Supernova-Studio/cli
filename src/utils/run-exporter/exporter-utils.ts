@@ -9,7 +9,7 @@
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Imports
 
-import { PLLogger } from "@supernova-studio/pulsar-core"
+import { PLLogger } from "@supernova-studio/pulsar-language"
 import { Environment, ExportConfiguration } from "../../types/types"
 import { environmentAPI } from "../network"
 
