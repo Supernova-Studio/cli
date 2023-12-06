@@ -165,9 +165,10 @@ export class FigmaTokensDataLoader {
           'Unable to load mapping file: `mapping`.`tokenSets` must be an Array with at least one entry'
         )
       }
-      if (map.tokensTheme && (typeof map.tokensTheme !== 'string' || (map.tokensTheme as string).length === 0)) {
+
+      if (map.tokensTheme && ((typeof map.tokensTheme !== 'string' && !Array.isArray(map.tokensTheme)) || map.tokensTheme.length === 0)) {
         throw new Error(
-          'Unable to load mapping file: `mapping`.`tokensTheme` must be a non-empty string'
+          'Unable to load mapping file: `mapping`.`tokensTheme` must be a non-empty string or non-empty array of strings'
         )
       }
       if (!map.supernovaBrand || typeof map.supernovaBrand !== 'string' || map.supernovaBrand.length === 0) {

@@ -3,10 +3,14 @@ name: Install CLI @PROD
 on:
   # push:
   #   branches: [ main ]
-  pull_request:
-    branches:
-      - "main"
+  # pull_request:
+  #   branches:
+  #     - "main"
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Deploy to PROD"]
+    types:
+      - completed
 
 jobs:
   build:
