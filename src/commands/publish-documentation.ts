@@ -10,8 +10,7 @@
 // MARK: - Imports
 
 import { Command, Flags } from "@oclif/core"
-import { DesignSystem, DesignSystemVersion, Supernova, SupernovaToolsDesignTokensPlugin } from "@supernovaio/supernova-sdk"
-import { DocumentationEnvironment } from "@supernovaio/supernova-sdk/build/Typescript/src/model/enums/SDKDocumentationEnvironment"
+import { DesignSystem, DesignSystemVersion, RemoteWorkspaceVersionIdentifier, Supernova } from "@supernova-studio/supernova-sdk-beta"
 import { Environment, ErrorCode } from "../types/types"
 import { environmentAPI } from "../utils/network"
 import "colors"
@@ -69,9 +68,9 @@ export class PublishDocumentation extends Command {
       const { flags } = await this.parse(PublishDocumentation)
 
       // Get workspace -> design system –> version
-      let connected = await this.getWritableVersion(flags)
-      let documentation = await connected.version.documentation()
-      let result = await documentation.publish(flags.target as DocumentationEnvironment)
+      let { instance, id } = await this.getWritableVersion(flags)
+      let documentation = await instance.documentation.getDocumentation(id)
+      let result = await instance.automation.publish(id, flags.target as any)
 
       if (result.status === "Queued") {
         this.log("\nDone: Documentation queued for publishing".green)
@@ -92,6 +91,7 @@ export class PublishDocumentation extends Command {
     instance: Supernova
     designSystem: DesignSystem
     version: DesignSystemVersion
+    id: RemoteWorkspaceVersionIdentifier
   }> {
     if (!flags.apiKey || flags.apiKey.length === 0) {
       throw new Error(`API key must not be empty`)
@@ -102,14 +102,15 @@ export class PublishDocumentation extends Command {
     }
 
     // Create instance for prod / dev
-    let sdkInstance = new Supernova(flags.apiKey, environmentAPI(flags.environment as Environment, undefined), null)
+    let apiUrl = environmentAPI(flags.environment as Environment, undefined)
+    let sdkInstance = new Supernova(flags.apiKey, { apiUrl, bypassEnvFetch: true })
 
-    let designSystem = await sdkInstance.designSystem(flags.designSystemId)
+    let designSystem = await sdkInstance.designSystems.designSystem(flags.designSystemId)
     if (!designSystem) {
       throw new Error(`Design system ${flags.designSystemId} not found or not available under provided API key`)
     }
 
-    let version = await designSystem.activeVersion()
+    let version = await sdkInstance.versions.getActiveVersion(flags.designSystemId)
     if (!version) {
       throw new Error(`Design system  ${flags.designSystemId} writable version not found or not available under provided API key`)
     }
@@ -118,6 +119,7 @@ export class PublishDocumentation extends Command {
       instance: sdkInstance,
       designSystem: designSystem,
       version: version,
+      id: { designSystemId: flags.designSystemId, versionId: version.id, workspaceId: designSystem.workspaceId }
     }
   }
 }

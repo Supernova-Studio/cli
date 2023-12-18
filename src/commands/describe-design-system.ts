@@ -10,7 +10,7 @@
 // MARK: - Imports
 
 import { Command, Flags } from "@oclif/core"
-import { DesignSystem, DesignSystemVersion, Supernova } from "@supernovaio/supernova-sdk"
+import { DesignSystem, DesignSystemVersion, RemoteVersionIdentifier, Supernova } from "@supernova-studio/supernova-sdk-beta"
 import { Environment, ErrorCode } from "../types/types"
 import { environmentAPI } from "../utils/network"
 import "colors"
@@ -65,17 +65,16 @@ export class DescribeDesignSystem extends Command {
       const { flags } = await this.parse(DescribeDesignSystem)
 
       // Get workspace -> design system –> version
-      let connected = await this.getWritableVersion(flags)
+      let { instance, id, designSystem } = await this.getWritableVersion(flags)
 
       // Get brands and themes
-      let version = connected.version
-      let brands = await version.brands()
-      let themes = await version.themes()
+      let brands = await instance.brands.getBrands(id)
+      let themes = await instance.tokens.getTokenThemes(id)
 
-      this.log(`\n↳ Design system "${connected.designSystem.name}", id: ${connected.designSystem.id}`.cyan)
+      this.log(`\n↳ Design system "${designSystem.name}", id: ${designSystem.id}`.cyan)
       for (let brand of brands) {
-        this.log(`  ↳ Brand: "${brand.name}", id: ${brand.persistentId}`)
-        let brandThemes = themes.filter((t) => t.brandId === brand.persistentId)
+        this.log(`  ↳ Brand: "${brand.name}", id: ${brand.idInVersion}`)
+        let brandThemes = themes.filter((t) => t.brandId === brand.idInVersion)
         if (brandThemes.length > 0) {
           for (let theme of brandThemes) {
             this.log(`    ↳ Theme: "${theme.name}", id: ${theme.id}`)
@@ -98,6 +97,7 @@ export class DescribeDesignSystem extends Command {
     instance: Supernova
     designSystem: DesignSystem
     version: DesignSystemVersion
+    id: RemoteVersionIdentifier
   }> {
     if (!flags.apiKey || flags.apiKey.length === 0) {
       throw new Error(`API key must not be empty`)
@@ -108,14 +108,15 @@ export class DescribeDesignSystem extends Command {
     }
 
     // Create instance for prod / dev
-    let sdkInstance = new Supernova(flags.apiKey, environmentAPI(flags.environment as Environment, undefined), null)
+    let apiUrl = environmentAPI(flags.environment as Environment, undefined)
+    let sdkInstance = new Supernova(flags.apiKey, { apiUrl, bypassEnvFetch: true })
 
-    let designSystem = await sdkInstance.designSystem(flags.designSystemId)
+    let designSystem = await sdkInstance.designSystems.designSystem(flags.designSystemId)
     if (!designSystem) {
       throw new Error(`Design system ${flags.designSystemId} not found or not available under provided API key`)
     }
 
-    let version = await designSystem.activeVersion()
+    let version = await sdkInstance.versions.getActiveVersion(flags.designSystemId)
     if (!version) {
       throw new Error(`Design system  ${flags.designSystemId} writable version not found or not available under provided API key`)
     }
@@ -124,6 +125,7 @@ export class DescribeDesignSystem extends Command {
       instance: sdkInstance,
       designSystem: designSystem,
       version: version,
+      id: { designSystemId: flags.designSystemId, versionId: version.id }
     }
   }
 }

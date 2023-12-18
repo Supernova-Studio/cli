@@ -10,7 +10,7 @@
 // MARK: - Imports
 
 import { Command, Flags } from "@oclif/core"
-import { DesignSystem, DesignSystemVersion, Supernova, SupernovaToolsDesignTokensPlugin } from "@supernovaio/supernova-sdk"
+import { Supernova, DesignSystem, DesignSystemVersion, RemoteVersionIdentifier } from "@supernova-studio/supernova-sdk-beta"
 import { Environment, ErrorCode } from "../types/types"
 import { FigmaTokensDataLoader } from "../utils/figma-tokens-data-loader"
 import { environmentAPI } from "../utils/network"
@@ -83,7 +83,7 @@ export class SyncDesignTokens extends Command {
       const { flags } = await this.parse(SyncDesignTokens)
 
       // Get workspace -> design system –> version
-      let connected = await this.getWritableVersion(flags)
+      let { instance, id } = await this.getWritableVersion(flags)
       let dataLoader = new FigmaTokensDataLoader()
       let configDefinition = dataLoader.loadConfigFromPath(flags.configFilePath)
       let settings = configDefinition.settings
@@ -104,7 +104,7 @@ export class SyncDesignTokens extends Command {
       let tokenDefinition = flags.tokenDirPath
         ? await dataLoader.loadTokensFromDirectory(flags.tokenDirPath, flags.configFilePath)
         : await dataLoader.loadTokensFromPath(flags.tokenFilePath!)
-      const response = await connected.version.writer().writeTokenStudioData(buildData(tokenDefinition)) as any
+      const response = await instance.versions.writeTokenStudioData(id, buildData(tokenDefinition)) as any
       if (response?.result?.logs && response.result.logs.length > 0) {
         for (const log of response.result.logs) {
           this.log(log)
@@ -133,6 +133,7 @@ export class SyncDesignTokens extends Command {
     instance: Supernova
     designSystem: DesignSystem
     version: DesignSystemVersion
+    id: RemoteVersionIdentifier
   }> {
     if (!flags.apiKey || flags.apiKey.length === 0) {
       throw new Error(`API key must not be empty`)
@@ -145,15 +146,15 @@ export class SyncDesignTokens extends Command {
     // We might need to ask people to update CLI before release, so after release all of them use BE call
     // and do not push old tokens into new model.
     // We will make a BE v1 bff/import endpoint to error with "Please, update CLI" message.
-    const apiUrl = flags.apiUrl && flags.apiUrl.length > 0 ? flags.apiUrl : environmentAPI(flags.environment as Environment, "v2")
-    let sdkInstance = new Supernova(flags.apiKey, apiUrl, null)
+    let apiUrl = flags.apiUrl && flags.apiUrl.length > 0 ? flags.apiUrl : environmentAPI(flags.environment as Environment, "v2")
+    let sdkInstance = new Supernova(flags.apiKey, { apiUrl, bypassEnvFetch: true })
 
-    let designSystem = await sdkInstance.designSystem(flags.designSystemId)
+    let designSystem = await sdkInstance.designSystems.designSystem(flags.designSystemId)
     if (!designSystem) {
       throw new Error(`Design system ${flags.designSystemId} not found or not available under provided API key`)
     }
 
-    let version = await designSystem.activeVersion()
+    let version = await sdkInstance.versions.getActiveVersion(flags.designSystemId)
     if (!version) {
       throw new Error(`Design system  ${flags.designSystemId} writable version not found or not available under provided API key`)
     }
@@ -162,6 +163,7 @@ export class SyncDesignTokens extends Command {
       instance: sdkInstance,
       designSystem: designSystem,
       version: version,
+      id: { designSystemId: flags.designSystemId, versionId: version.id }
     }
   }
 }

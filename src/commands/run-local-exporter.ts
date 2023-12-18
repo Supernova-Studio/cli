@@ -18,7 +18,7 @@ import {
   PCEngineFileDescriptor,
 } from "@supernova-studio/pulsar-core"
 import { PLLogger } from "@supernova-studio/pulsar-language"
-import { Brand, DesignSystem, DesignSystemVersion, Supernova, TokenTheme } from "@supernovaio/supernova-sdk"
+import { Brand, DesignSystem, DesignSystemVersion, RemoteVersionIdentifier, Supernova, TokenTheme } from "@supernova-studio/supernova-sdk-beta"
 import { Environment } from "../types/types"
 import { environmentAPI } from "../utils/network"
 import { exportConfiguration } from "../utils/run-exporter/exporter-utils"
@@ -152,14 +152,15 @@ export class RunLocalExporter extends Command {
     }
 
     // Create instance for prod / dev
-    let sdkInstance = new Supernova(flags.apiKey, environmentAPI(flags.environment as Environment, undefined), null)
+    let apiUrl = environmentAPI(flags.environment as Environment, undefined)
+    let sdkInstance = new Supernova(flags.apiKey, { apiUrl, bypassEnvFetch: true })
 
-    let designSystem = await sdkInstance.designSystem(flags.designSystemId)
+    let designSystem = await sdkInstance.designSystems.designSystem(flags.designSystemId)
     if (!designSystem) {
       throw new Error(`Design system ${flags.designSystemId} not found or not available under provided API key`)
     }
 
-    let version = await designSystem.activeVersion()
+    let version = await sdkInstance.versions.getActiveVersion(flags.designSystemId)
     if (!version) {
       throw new Error(`Design system  ${flags.designSystemId} version not found or not available under provided API key`)
     }
@@ -169,10 +170,11 @@ export class RunLocalExporter extends Command {
       throw new Error(`Brand ID must be provided when theme ID is provided as well`)
     }
 
+    const id: RemoteVersionIdentifier = { designSystemId: flags.designSystemId, versionId: version.id };
     let brand: Brand | null = null
     if (flags.brandId) {
-      const brands = await version.brands()
-      brand = brands.find((brand) => brand.id === flags.brandId || brand.persistentId === flags.brandId) ?? null
+      const brands = await sdkInstance.brands.getBrands(id)
+      brand = brands.find((brand) => brand.id === flags.brandId || brand.idInVersion === flags.brandId) ?? null
       if (!brand) {
         throw new Error(`Brand ${flags.brandId} not found in specified design system`)
       }
@@ -180,8 +182,8 @@ export class RunLocalExporter extends Command {
 
     let theme: TokenTheme | null = null
     if (flags.themeId) {
-      const themes = await brand!.themes()
-      theme = themes.find((theme) => theme.id === flags.themeId || theme.versionedId === flags.themeId) ?? null
+      const themes = await sdkInstance.tokens.getTokenThemes(id)
+      theme = themes.find((theme) => theme.id === flags.themeId || theme.idInVersion === flags.themeId) ?? null
       if (!theme) {
         throw new Error(`Theme ${flags.themeId} not found in specified brand`)
       }
