@@ -10,19 +10,12 @@
 // MARK: - Imports
 
 import { Command, Flags } from "@oclif/core"
-import { DesignSystem, DesignSystemVersion, RemoteVersionIdentifier, Supernova } from "@supernova-studio/supernova-sdk-beta"
 import { Environment, ErrorCode } from "../types/types"
-import { environmentAPI } from "../utils/network"
+import { getWritableVersion } from "../utils/sdk"
 import "colors"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
-
-interface DescribeDesignSystemFlags {
-  apiKey: string
-  designSystemId: string
-  environment: string
-}
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Configuration
@@ -55,6 +48,11 @@ export class DescribeDesignSystem extends Command {
       options: Object.values(Environment),
       default: Environment.production,
     }),
+    proxyUrl: Flags.string({
+      description: "When set, CLI will use provided proxy URL for all requests",
+      hidden: true,
+      required: false,
+    }),
   }
 
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -65,7 +63,7 @@ export class DescribeDesignSystem extends Command {
       const { flags } = await this.parse(DescribeDesignSystem)
 
       // Get workspace -> design system –> version
-      let { instance, id, designSystem } = await this.getWritableVersion(flags)
+      let { instance, id, designSystem } = await getWritableVersion(flags)
 
       // Get brands and themes
       let brands = await instance.brands.getBrands(id)
@@ -90,42 +88,6 @@ export class DescribeDesignSystem extends Command {
       this.error(`Design system description failed: ${error}`.red, {
         code: ErrorCode.designSystemDescriptionFailed,
       })
-    }
-  }
-
-  async getWritableVersion(flags: DescribeDesignSystemFlags): Promise<{
-    instance: Supernova
-    designSystem: DesignSystem
-    version: DesignSystemVersion
-    id: RemoteVersionIdentifier
-  }> {
-    if (!flags.apiKey || flags.apiKey.length === 0) {
-      throw new Error(`API key must not be empty`)
-    }
-
-    if (!flags.designSystemId || flags.designSystemId.length === 0) {
-      throw new Error(`Design System ID must not be empty`)
-    }
-
-    // Create instance for prod / dev
-    let apiUrl = environmentAPI(flags.environment as Environment, undefined)
-    let sdkInstance = new Supernova(flags.apiKey, { apiUrl, bypassEnvFetch: true })
-
-    let designSystem = await sdkInstance.designSystems.designSystem(flags.designSystemId)
-    if (!designSystem) {
-      throw new Error(`Design system ${flags.designSystemId} not found or not available under provided API key`)
-    }
-
-    let version = await sdkInstance.versions.getActiveVersion(flags.designSystemId)
-    if (!version) {
-      throw new Error(`Design system  ${flags.designSystemId} writable version not found or not available under provided API key`)
-    }
-
-    return {
-      instance: sdkInstance,
-      designSystem: designSystem,
-      version: version,
-      id: { designSystemId: flags.designSystemId, versionId: version.id }
     }
   }
 }

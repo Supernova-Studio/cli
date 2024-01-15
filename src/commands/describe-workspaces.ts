@@ -21,6 +21,7 @@ import "colors"
 interface DescribeWorkspacesFlags {
   apiKey: string
   environment: string
+  proxyUrl?: string
 }
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -53,6 +54,11 @@ export class DescribeWorkspaces extends Command {
       required: false,
       options: Object.values(Environment),
       default: Environment.production,
+    }),
+    proxyUrl: Flags.string({
+      description: "When set, CLI will use provided proxy URL for all requests",
+      hidden: true,
+      required: false,
     }),
   }
 
@@ -113,7 +119,7 @@ export class DescribeWorkspaces extends Command {
 
     // Create instance for prod / dev
     let apiUrl = environmentAPI(flags.environment as Environment, undefined)
-    let sdkInstance = new Supernova(flags.apiKey, { apiUrl, bypassEnvFetch: true })
+    let sdkInstance = new Supernova(flags.apiKey, { apiUrl, bypassEnvFetch: true, proxyUrl: flags.proxyUrl })
     let user = await sdkInstance.me.me();
     let workspaces = await sdkInstance.workspaces.workspaces(user.id)
     return {

@@ -26,7 +26,7 @@
         "@oclif/plugin-help": "6.0.6",
         "@oclif/plugin-plugins": "4.1.7",
         "@supernova-studio/pulsar-core": "2.1.0",
-        "@supernova-studio/supernova-sdk-beta": "1.6.29",
+        "@supernova-studio/supernova-sdk-beta": "1.6.33",
         "axios": "^1.6.2",
         "chalk": "^5.0.1",
         "colors": "^1.4.0",
@@ -35,7 +35,9 @@
     },
     "bundleDependencies": [
         "@supernova-studio/pulsar-core",
-        "@supernova-studio/simple-parse-github-url"
+        "@supernova-studio/simple-parse-github-url",
+        "@supernova-studio/client",
+        "@supernova-studio/model"
     ],
     "devDependencies": {
         "@babel/core": "^7.9.0",
