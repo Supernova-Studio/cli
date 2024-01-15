@@ -98,6 +98,11 @@ export class RunLocalExporter extends Command {
       options: Object.values(Environment),
       default: Environment.production,
     }),
+    proxyUrl: Flags.string({
+      description: "When set, CLI will use provided proxy URL for all requests",
+      hidden: true,
+      required: false,
+    }),
   }
 
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -163,6 +168,7 @@ export class RunLocalExporter extends Command {
         brandId: flags.brandId,
         themeId: flags.themeId,
         logger: logger,
+        proxyUrl: flags.proxyUrl,
       })
 
       // Set logo overrides

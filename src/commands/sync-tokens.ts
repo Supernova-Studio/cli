@@ -88,7 +88,7 @@ export class SyncDesignTokens extends Command {
       const { flags } = await this.parse(SyncDesignTokens)
 
       // Get workspace -> design system –> version
-      let { instance, id } = await getWritableVersion(flags, "v2")
+      let { instance, id } = await getWritableVersion(flags)
       let dataLoader = new FigmaTokensDataLoader()
       let configDefinition = dataLoader.loadConfigFromPath(flags.configFilePath)
       let settings = configDefinition.settings

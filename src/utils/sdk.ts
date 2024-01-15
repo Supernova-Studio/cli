@@ -13,7 +13,7 @@ export interface DefaultDesignSystemFlags {
     proxyUrl?: string
 }
 
-export async function getWritableVersion(flags: DefaultDesignSystemFlags, apiVersion?: string): Promise<{
+export async function getWritableVersion(flags: DefaultDesignSystemFlags, apiVersion: string = "v2"): Promise<{
     instance: Supernova
     designSystem: DesignSystem
     version: DesignSystemVersion

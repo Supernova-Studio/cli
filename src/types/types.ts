@@ -25,6 +25,7 @@ export interface ExportConfiguration {
   exportPath: string
   debugMode?: boolean
   logger: PLLogger
+  proxyUrl?: string
 }
 
 export enum Environment {
