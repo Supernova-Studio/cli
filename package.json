@@ -35,7 +35,9 @@
     },
     "bundleDependencies": [
         "@supernova-studio/pulsar-core",
-        "@supernova-studio/simple-parse-github-url"
+        "@supernova-studio/simple-parse-github-url",
+        "@supernova-studio/client",
+        "@supernova-studio/model"
     ],
     "devDependencies": {
         "@babel/core": "^7.9.0",
