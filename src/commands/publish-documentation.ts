@@ -67,13 +67,13 @@ export class PublishDocumentation extends Command {
       // Get workspace -> design system –> version
       let { instance, id } = await getWritableVersion(flags)
       let documentation = await instance.documentation.getDocumentation(id)
-      let result = await instance.automation.publish(id, flags.target as any)
+      let result = await instance.documentation.publish(id, flags.target as any)
 
-      if (result.status === "Queued") {
+      if (result.status === "Success") {
         this.log("\nDone: Documentation queued for publishing".green)
       } else if (result.status === "InProgress") {
         this.log("\n Done: Skipped documentation publish as another build is already in progress".green)
-      } else if (result.status === "Failure") {
+      } else if (result.status === "Failed") {
         throw new Error(`Documentation publish failed with unknown failure`)
       }
     } catch (error) {
