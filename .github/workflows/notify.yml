@@ -3,6 +3,8 @@ name: Notify Slack
 on:
   workflow_dispatch:
   workflow_run:
+    # Add "Install CLI @develop" and notify on both with different message, or use separate action as
+    # >If you specify multiple workflows for the workflow_run event, only one of the workflows needs to run. For example, a workflow with the following trigger will run whenever the "Staging" workflow or the "Lab" workflow completes.
     workflows: ["Install CLI @PROD"]
     types: [completed]
 
