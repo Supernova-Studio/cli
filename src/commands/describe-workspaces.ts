@@ -79,12 +79,12 @@ export class DescribeWorkspaces extends Command {
         this.log(`↳ Workspace "${workspace.profile.name}", handle: "${workspace.profile.handle}", id: ${workspace.id}`.magenta)
         for (let designSystem of designSystems) {
           this.log(`  ↳ Design system "${designSystem.name}", id: ${designSystem.id}`.cyan)
-          let version = await instance.versions.getActiveVersion(flags.designSystemId)
+          let version = await instance.versions.getActiveVersion(designSystem.id)
           if (!version) {
-            this.log(`Design system  ${flags.designSystemId} active version not found or not available under provided API key`)
+            this.log(`Design system  ${designSystem.id} active version not found or not available under provided API key`)
             continue;
           }
-          let id: RemoteVersionIdentifier = { designSystemId: flags.designSystemId, versionId: version.id };
+          let id: RemoteVersionIdentifier = { designSystemId: designSystem.id, versionId: version.id };
           let brands = await instance.brands.getBrands(id)
           let themes = await instance.tokens.getTokenThemes(id)
           for (let brand of brands) {
@@ -118,7 +118,7 @@ export class DescribeWorkspaces extends Command {
     }
 
     // Create instance for prod / dev
-    let apiUrl = environmentAPI(flags.environment as Environment, undefined)
+    let apiUrl = environmentAPI(flags.environment as Environment, "v2")
     let sdkInstance = new Supernova(flags.apiKey, { apiUrl, bypassEnvFetch: true, proxyUrl: flags.proxyUrl })
     let user = await sdkInstance.me.me();
     let workspaces = await sdkInstance.workspaces.workspaces(user.id)
