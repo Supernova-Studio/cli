@@ -4,7 +4,7 @@ import {
   DTPluginToSupernovaMapPack,
   DTPluginToSupernovaMappingFile,
   DTPluginToSupernovaMapType
-} from "@supernova-studio/supernova-sdk-beta"
+} from "@supernovaio/sdk"
 import * as fs from 'fs'
 const path = require('path')
 

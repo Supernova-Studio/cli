@@ -1,4 +1,4 @@
-import { Brand, DesignSystem, DesignSystemVersion, RemoteWorkspaceVersionIdentifier, Supernova, TokenTheme } from "@supernova-studio/supernova-sdk-beta"
+import { Brand, DesignSystem, DesignSystemVersion, RemoteWorkspaceVersionIdentifier, Supernova, TokenTheme } from "@supernovaio/sdk"
 import { Environment } from "../types/types"
 import { environmentAPI } from "../utils/network"
 import "colors"

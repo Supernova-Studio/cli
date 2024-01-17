@@ -10,7 +10,7 @@
 // MARK: - Imports
 
 import { Command, Flags } from "@oclif/core"
-import { RemoteVersionIdentifier, Supernova, Workspace } from "@supernova-studio/supernova-sdk-beta"
+import { RemoteVersionIdentifier, Supernova, Workspace } from "@supernovaio/sdk"
 import { Environment, ErrorCode } from "../types/types"
 import { environmentAPI } from "../utils/network"
 import "colors"
