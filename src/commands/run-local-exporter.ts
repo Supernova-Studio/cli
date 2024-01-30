@@ -18,14 +18,13 @@ import {
   PCEngineFileDescriptor,
 } from "@supernova-studio/pulsar-core"
 import { PLLogger } from "@supernova-studio/pulsar-language"
-import { Brand, DesignSystem, DesignSystemVersion, Supernova, TokenTheme } from "@supernovaio/supernova-sdk"
 import { Environment } from "../types/types"
-import { environmentAPI } from "../utils/network"
 import { exportConfiguration } from "../utils/run-exporter/exporter-utils"
 import * as fs from "fs"
 import * as path from "path"
 import axios from "axios"
 import "colors"
+import { getWritableVersion } from "../utils/sdk"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
@@ -39,6 +38,7 @@ interface RunLocalExporterFlags {
   outputDir: string
   allowOverridingOutput: boolean
   environment: string
+  proxyUrl?: string
 }
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -98,6 +98,11 @@ export class RunLocalExporter extends Command {
       options: Object.values(Environment),
       default: Environment.production,
     }),
+    proxyUrl: Flags.string({
+      description: "When set, CLI will use provided proxy URL for all requests",
+      hidden: true,
+      required: false,
+    }),
   }
 
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -109,8 +114,8 @@ export class RunLocalExporter extends Command {
     // Execute exporter
     try {
       // Get workspace -> design system –> version
-      let connected = await this.getWritableVersion(flags)
-      const result = await this.executeExporter(flags, connected.version.id)
+      let { version } = await getWritableVersion(flags)
+      const result = await this.executeExporter(flags, version.id)
 
       // Log user logs from the execution
       // Note this is currently not used because console.log is directly routed to the stdout and we have no control over it. Pulsar must be updated before this is doable
@@ -133,66 +138,6 @@ export class RunLocalExporter extends Command {
       this.error(`Export failed: ${error.message}`.red, {
         code: "ERR_EXPORT_FAILED",
       })
-    }
-  }
-
-  async getWritableVersion(flags: RunLocalExporterFlags): Promise<{
-    instance: Supernova
-    designSystem: DesignSystem
-    brand: Brand | null
-    theme: TokenTheme | null
-    version: DesignSystemVersion
-  }> {
-    if (!flags.apiKey || flags.apiKey.length === 0) {
-      throw new Error(`API key must not be empty`)
-    }
-
-    if (!flags.designSystemId || flags.designSystemId.length === 0) {
-      throw new Error(`Design System ID must not be empty`)
-    }
-
-    // Create instance for prod / dev
-    let sdkInstance = new Supernova(flags.apiKey, environmentAPI(flags.environment as Environment, undefined), null)
-
-    let designSystem = await sdkInstance.designSystem(flags.designSystemId)
-    if (!designSystem) {
-      throw new Error(`Design system ${flags.designSystemId} not found or not available under provided API key`)
-    }
-
-    let version = await designSystem.activeVersion()
-    if (!version) {
-      throw new Error(`Design system  ${flags.designSystemId} version not found or not available under provided API key`)
-    }
-
-    // Get themes and brands if provided
-    if (flags.themeId && !flags.brandId) {
-      throw new Error(`Brand ID must be provided when theme ID is provided as well`)
-    }
-
-    let brand: Brand | null = null
-    if (flags.brandId) {
-      const brands = await version.brands()
-      brand = brands.find((brand) => brand.id === flags.brandId || brand.persistentId === flags.brandId) ?? null
-      if (!brand) {
-        throw new Error(`Brand ${flags.brandId} not found in specified design system`)
-      }
-    }
-
-    let theme: TokenTheme | null = null
-    if (flags.themeId) {
-      const themes = await brand!.themes()
-      theme = themes.find((theme) => theme.id === flags.themeId || theme.versionedId === flags.themeId) ?? null
-      if (!theme) {
-        throw new Error(`Theme ${flags.themeId} not found in specified brand`)
-      }
-    }
-
-    return {
-      instance: sdkInstance,
-      designSystem: designSystem,
-      brand: brand,
-      theme: theme,
-      version: version,
     }
   }
 
@@ -223,6 +168,7 @@ export class RunLocalExporter extends Command {
         brandId: flags.brandId,
         themeId: flags.themeId,
         logger: logger,
+        proxyUrl: flags.proxyUrl,
       })
 
       // Set logo overrides

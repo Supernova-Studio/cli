@@ -10,21 +10,12 @@
 // MARK: - Imports
 
 import { Command, Flags } from "@oclif/core"
-import { DesignSystem, DesignSystemVersion, Supernova, SupernovaToolsDesignTokensPlugin } from "@supernovaio/supernova-sdk"
-import { DocumentationEnvironment } from "@supernovaio/supernova-sdk/build/Typescript/src/model/enums/SDKDocumentationEnvironment"
 import { Environment, ErrorCode } from "../types/types"
-import { environmentAPI } from "../utils/network"
+import { getWritableVersion } from "../utils/sdk"
 import "colors"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
-
-interface PublishDocumentationFlags {
-  apiKey: string
-  designSystemId: string
-  target: string
-  environment: string
-}
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Configuration
@@ -59,6 +50,11 @@ export class PublishDocumentation extends Command {
       options: Object.values(Environment),
       default: Environment.production,
     }),
+    proxyUrl: Flags.string({
+      description: "When set, CLI will use provided proxy URL for all requests",
+      hidden: true,
+      required: false,
+    }),
   }
 
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -69,15 +65,15 @@ export class PublishDocumentation extends Command {
       const { flags } = await this.parse(PublishDocumentation)
 
       // Get workspace -> design system –> version
-      let connected = await this.getWritableVersion(flags)
-      let documentation = await connected.version.documentation()
-      let result = await documentation.publish(flags.target as DocumentationEnvironment)
+      let { instance, id } = await getWritableVersion(flags)
+      let documentation = await instance.documentation.getDocumentation(id)
+      let result = await instance.documentation.publish(id, flags.target as any)
 
-      if (result.status === "Queued") {
+      if (result.status === "Success") {
         this.log("\nDone: Documentation queued for publishing".green)
       } else if (result.status === "InProgress") {
         this.log("\n Done: Skipped documentation publish as another build is already in progress".green)
-      } else if (result.status === "Failure") {
+      } else if (result.status === "Failed") {
         throw new Error(`Documentation publish failed with unknown failure`)
       }
     } catch (error) {
@@ -85,39 +81,6 @@ export class PublishDocumentation extends Command {
       this.error(`Publishing documentation failed: ${error}`.red, {
         code: ErrorCode.documentationPublishingFailed,
       })
-    }
-  }
-
-  async getWritableVersion(flags: PublishDocumentationFlags): Promise<{
-    instance: Supernova
-    designSystem: DesignSystem
-    version: DesignSystemVersion
-  }> {
-    if (!flags.apiKey || flags.apiKey.length === 0) {
-      throw new Error(`API key must not be empty`)
-    }
-
-    if (!flags.designSystemId || flags.designSystemId.length === 0) {
-      throw new Error(`Design System ID must not be empty`)
-    }
-
-    // Create instance for prod / dev
-    let sdkInstance = new Supernova(flags.apiKey, environmentAPI(flags.environment as Environment, undefined), null)
-
-    let designSystem = await sdkInstance.designSystem(flags.designSystemId)
-    if (!designSystem) {
-      throw new Error(`Design system ${flags.designSystemId} not found or not available under provided API key`)
-    }
-
-    let version = await designSystem.activeVersion()
-    if (!version) {
-      throw new Error(`Design system  ${flags.designSystemId} writable version not found or not available under provided API key`)
-    }
-
-    return {
-      instance: sdkInstance,
-      designSystem: designSystem,
-      version: version,
     }
   }
 }

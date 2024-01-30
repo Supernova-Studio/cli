@@ -1,0 +1,36 @@
+name: Notify Slack
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    # Add "Install CLI @develop" and notify on both with different message, or use separate action as
+    # >If you specify multiple workflows for the workflow_run event, only one of the workflows needs to run. For example, a workflow with the following trigger will run whenever the "Staging" workflow or the "Lab" workflow completes.
+    workflows: ["Install CLI @PROD"]
+    types: [completed]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/Hydrogen
+
+      - name: Install Slack bot
+        run: npm i -g @supernova-studio/ci-bot
+
+      - name: Get NPM version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
+
+      - name: Notify Slack channel on success
+        run: supernova-ci-bot slack-send-message -c "#ci-cli" -m "New version of Supernova CLI is published!\n - ${{ steps.package-version.outputs.current-version}}\n${{ secrets.SLACK_CC }}"
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+      - name: Notify Slack channel on failure
+        run: supernova-ci-bot slack-send-message -c "#ci-cli" -m "Running smoke tests for CLI has failed!\n - ${{ steps.package-version.outputs.current-version}}\n${{ secrets.SLACK_CC }}"
+        if: ${{ github.event.workflow_run.conclusion == 'failure' }}

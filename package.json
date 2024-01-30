@@ -1,7 +1,7 @@
 {
     "name": "@supernovaio/cli",
     "description": "Supernova.io Command Line Interface",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "author": "Supernova.io",
     "homepage": "https://supernova.io/",
     "keywords": [
@@ -25,8 +25,8 @@
         "@oclif/core": "3.11.0",
         "@oclif/plugin-help": "6.0.6",
         "@oclif/plugin-plugins": "4.1.7",
-        "@supernovaio/supernova-sdk": "1.9.5",
-        "@supernova-studio/pulsar-core": "2.1.0",
+        "@supernova-studio/pulsar-core": "2.1.7",
+        "@supernovaio/sdk": "2.0.12",
         "axios": "^1.6.2",
         "chalk": "^5.0.1",
         "colors": "^1.4.0",
@@ -35,7 +35,9 @@
     },
     "bundleDependencies": [
         "@supernova-studio/pulsar-core",
-        "@supernova-studio/simple-parse-github-url"
+        "@supernova-studio/simple-parse-github-url",
+        "@supernova-studio/client",
+        "@supernova-studio/model"
     ],
     "devDependencies": {
         "@babel/core": "^7.9.0",

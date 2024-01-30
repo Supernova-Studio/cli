@@ -10,7 +10,7 @@
 // MARK: - Imports
 
 import { Command, Flags } from "@oclif/core"
-import { Supernova, Workspace } from "@supernovaio/supernova-sdk"
+import { RemoteVersionIdentifier, Supernova, Workspace } from "@supernovaio/sdk"
 import { Environment, ErrorCode } from "../types/types"
 import { environmentAPI } from "../utils/network"
 import "colors"
@@ -21,6 +21,7 @@ import "colors"
 interface DescribeWorkspacesFlags {
   apiKey: string
   environment: string
+  proxyUrl?: string
 }
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -54,6 +55,11 @@ export class DescribeWorkspaces extends Command {
       options: Object.values(Environment),
       default: Environment.production,
     }),
+    proxyUrl: Flags.string({
+      description: "When set, CLI will use provided proxy URL for all requests",
+      hidden: true,
+      required: false,
+    }),
   }
 
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -64,21 +70,26 @@ export class DescribeWorkspaces extends Command {
       const { flags } = await this.parse(DescribeWorkspaces)
 
       // Get workspaces
-      let connected = await this.getWorkspaces(flags)
+      let { workspaces, instance } = await this.getWorkspaces(flags)
       this.log(`\n`)
 
-      for (let workspace of connected.workspaces) {
+      for (let workspace of workspaces) {
         // Get design systems and log
-        let designSystems = await workspace.designSystems()
-        this.log(`↳ Workspace "${workspace.name}", handle: "${workspace.handle}", id: ${workspace.id}`.magenta)
+        let designSystems = await instance.designSystems.designSystems(workspace.id)
+        this.log(`↳ Workspace "${workspace.profile.name}", handle: "${workspace.profile.handle}", id: ${workspace.id}`.magenta)
         for (let designSystem of designSystems) {
           this.log(`  ↳ Design system "${designSystem.name}", id: ${designSystem.id}`.cyan)
-          let version = await designSystem.activeVersion()
-          let brands = await version.brands()
-          let themes = await version.themes()
+          let version = await instance.versions.getActiveVersion(designSystem.id)
+          if (!version) {
+            this.log(`Design system  ${designSystem.id} active version not found or not available under provided API key`)
+            continue;
+          }
+          let id: RemoteVersionIdentifier = { designSystemId: designSystem.id, versionId: version.id };
+          let brands = await instance.brands.getBrands(id)
+          let themes = await instance.tokens.getTokenThemes(id)
           for (let brand of brands) {
-            this.log(`    ↳ Brand: "${brand.name}", id: ${brand.persistentId}`)
-            let brandThemes = themes.filter((t) => t.brandId === brand.persistentId)
+            this.log(`    ↳ Brand: "${brand.name}", id: ${brand.idInVersion}`)
+            let brandThemes = themes.filter((t) => t.brandId === brand.idInVersion)
             if (brandThemes.length > 0) {
               for (let theme of brandThemes) {
                 this.log(`      ↳ Theme: "${theme.name}", id: ${theme.id}`.gray)
@@ -107,8 +118,10 @@ export class DescribeWorkspaces extends Command {
     }
 
     // Create instance for prod / dev
-    let sdkInstance = new Supernova(flags.apiKey, environmentAPI(flags.environment as Environment, undefined), null)
-    let workspaces = await sdkInstance.workspaces()
+    let apiUrl = environmentAPI(flags.environment as Environment, "v2")
+    let sdkInstance = new Supernova(flags.apiKey, { apiUrl, bypassEnvFetch: true, proxyUrl: flags.proxyUrl })
+    let user = await sdkInstance.me.me();
+    let workspaces = await sdkInstance.workspaces.workspaces(user.id)
     return {
       instance: sdkInstance,
       workspaces: workspaces,

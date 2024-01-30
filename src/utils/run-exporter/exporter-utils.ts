@@ -25,6 +25,7 @@ export function exportConfiguration(setup: {
   environment: Environment
   exportPath: string
   logger: PLLogger
+  proxyUrl?: string
 }): ExportConfiguration {
   return {
     apiUrl: environmentAPI(setup.environment, undefined),
@@ -36,5 +37,6 @@ export function exportConfiguration(setup: {
     themeId: setup.themeId,
     exportPath: setup.exportPath,
     logger: setup.logger,
+    proxyUrl: setup.proxyUrl,
   }
 }
