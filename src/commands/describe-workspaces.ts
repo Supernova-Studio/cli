@@ -88,8 +88,8 @@ export class DescribeWorkspaces extends Command {
           let brands = await instance.brands.getBrands(id)
           let themes = await instance.tokens.getTokenThemes(id)
           for (let brand of brands) {
-            this.log(`    ↳ Brand: "${brand.name}", id: ${brand.idInVersion}`)
-            let brandThemes = themes.filter((t) => t.brandId === brand.idInVersion)
+            this.log(`    ↳ Brand: "${brand.name}", id: ${brand.id}`)
+            let brandThemes = themes.filter((t) => t.brandId === brand.id)
             if (brandThemes.length > 0) {
               for (let theme of brandThemes) {
                 this.log(`      ↳ Theme: "${theme.name}", id: ${theme.id}`.gray)

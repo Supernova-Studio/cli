@@ -71,8 +71,8 @@ export class DescribeDesignSystem extends Command {
 
       this.log(`\n↳ Design system "${designSystem.name}", id: ${designSystem.id}`.cyan)
       for (let brand of brands) {
-        this.log(`  ↳ Brand: "${brand.name}", id: ${brand.idInVersion}`)
-        let brandThemes = themes.filter((t) => t.brandId === brand.idInVersion)
+        this.log(`  ↳ Brand: "${brand.name}", id: ${brand.id}`)
+        let brandThemes = themes.filter((t) => t.brandId === brand.id)
         if (brandThemes.length > 0) {
           for (let theme of brandThemes) {
             this.log(`    ↳ Theme: "${theme.name}", id: ${theme.id}`)
