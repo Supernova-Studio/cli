@@ -20,6 +20,9 @@ jobs:
         with:
           node-version: lts/Hydrogen
 
+      - name: Authenticate with private NPM package
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN_READ_PACKAGES }}" > ~/.npmrc
+        
       - name: Install Slack bot
         run: npm i -g @supernova-studio/ci-bot
 

@@ -1,0 +1,32 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "schedule": [
+        "after 10pm every weekday",
+        "before 5am every weekday",
+        "every weekend"
+    ],
+    "extends": [
+        "config:base"
+    ],
+    "packageRules": [
+        {
+            "matchPackagePatterns": [
+                "*"
+            ],
+            "enabled": false
+        },
+        {
+            "matchPackageNames": [
+                "@supernovaio/sdk",
+                "@supernova-studio/pulsar-core"
+            ],
+            "groupName": "supernova packages",
+            "schedule": [
+                "* * * * *"
+            ],
+            "prHourlyLimit": 0,
+            "enabled": true,
+            "bumpVersion": "patch"
+        }
+    ]
+}
