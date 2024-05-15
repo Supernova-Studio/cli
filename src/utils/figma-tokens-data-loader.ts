@@ -193,7 +193,9 @@ export class FigmaTokensDataLoader {
       if (mapping.settings.hasOwnProperty('verbose') && typeof mapping.settings.verbose !== 'boolean') {
         throw new Error('Unable to load mapping file: `verbose` must be of boolan type')
       }
-      if (mapping.settings.hasOwnProperty('preciseCopy') && typeof mapping.settings.preciseCopy !== 'boolean') {
+      if (mapping.settings.hasOwnProperty('preciseCopy')
+        && typeof mapping.settings.preciseCopy !== 'boolean'
+        && typeof mapping.settings.preciseCopy !== "string") {
         throw new Error('Unable to load mapping file: `preciseCopy` must be of boolan type')
       }
     }
@@ -220,6 +222,7 @@ export class FigmaTokensDataLoader {
     }
 
     let settings: DTPluginToSupernovaSettings = {
+      ...(mapping.settings ?? {}),
       dryRun: mapping.settings?.dryRun ?? false,
       verbose: mapping.settings?.verbose ?? false,
       preciseCopy: mapping.settings?.preciseCopy ?? false
