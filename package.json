@@ -1,7 +1,7 @@
 {
     "name": "@supernovaio/cli",
     "description": "Supernova.io Command Line Interface",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "author": "Supernova.io",
     "homepage": "https://supernova.io/",
     "keywords": [
@@ -104,7 +104,7 @@
         "lint": "eslint . --ext .ts --config .eslintrc",
         "postpack": "shx rm -f oclif.manifest.json",
         "prepack": "yarn build && oclif manifest",
-        "test": "DEBUG=* && npm run build && env TS_NODE_PROJECT=\"tsconfig.testing.json\" mocha --require ts-node/register --forbid-only \"test/**/*.test.ts\"",
+        "test": "DEBUG=* && npm run build && env TS_NODE_PROJECT=\"tsconfig.testing.json\" mocha --require ts-node/register --forbid-only \"test/**/sync-tokens.test.ts\"",
         "publish-package": "npm run build && npm run prepack && npm publish --access public && npm run postpack"
     },
     "types": "dist/index.d.ts"

@@ -188,15 +188,15 @@ export class FigmaTokensDataLoader {
         throw new Error('Unable to load mapping file: `settings` must be an object')
       }
       if (mapping.settings.hasOwnProperty('dryRun') && typeof mapping.settings.dryRun !== 'boolean') {
-        throw new Error('Unable to load mapping file: `dryRun` must be of boolan type')
+        throw new Error('Unable to load mapping file: `dryRun` must be of boolean type')
       }
       if (mapping.settings.hasOwnProperty('verbose') && typeof mapping.settings.verbose !== 'boolean') {
-        throw new Error('Unable to load mapping file: `verbose` must be of boolan type')
+        throw new Error('Unable to load mapping file: `verbose` must be of boolean type')
       }
       if (mapping.settings.hasOwnProperty('preciseCopy')
         && typeof mapping.settings.preciseCopy !== 'boolean'
         && typeof mapping.settings.preciseCopy !== "string") {
-        throw new Error('Unable to load mapping file: `preciseCopy` must be of boolan type')
+        throw new Error('Unable to load mapping file: `preciseCopy` must be of boolean or string type')
       }
     }
   }
