@@ -1,7 +1,7 @@
 {
     "name": "@supernovaio/cli",
     "description": "Supernova.io Command Line Interface",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "author": "Supernova.io",
     "homepage": "https://supernova.io/",
     "keywords": [
@@ -22,9 +22,9 @@
     },
     "bugs": "https://github.com/Supernova-Studio/cli/issues",
     "dependencies": {
-        "@oclif/core": "3.11.0",
-        "@oclif/plugin-help": "6.0.6",
-        "@oclif/plugin-plugins": "4.1.7",
+        "@oclif/core": "3.26.6",
+        "@oclif/plugin-help": "6.0.22",
+        "@oclif/plugin-plugins": "5.1.2",
         "@supernova-studio/pulsar-core": "2.1.7",
         "@supernovaio/sdk": "2.0.12",
         "axios": "^1.6.2",
