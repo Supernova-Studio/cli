@@ -27,7 +27,11 @@ describe("publish-documentation", function () {
     ]
 
     const result = await runCommand(commandAttributes);
-    if (result.error) console.error(result.error);
+    if (result.error) {
+      console.error("Command has failed")
+      console.error(commandAttributes.join("\n"))
+      console.error(result.error);
+    }
     expect(result.error).to.be.undefined;
   })
 })
