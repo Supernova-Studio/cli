@@ -21,6 +21,7 @@ describe("describe-workspaces", function () {
     const commandAttributes = ["describe-workspaces", `--apiKey=${process.env.TEST_API_KEY}`, `--environment=${process.env.TEST_ENVIRONMENT}`]
 
     const result = await runCommand(commandAttributes)
+    if (result.error) console.error(result.error);
     expect(result.error).to.be.undefined;
   })
 });

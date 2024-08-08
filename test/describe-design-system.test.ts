@@ -26,6 +26,7 @@ describe("describe-design-system", function () {
     ]
 
     const result = await runCommand(commandAttributes)
+    if (result.error) console.error(result.error);
     expect(result.error).to.be.undefined;
   })
 })
