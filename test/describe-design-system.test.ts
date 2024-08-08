@@ -9,25 +9,24 @@
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Imports
 
-import { expect, test } from "@oclif/test"
-import * as path from "path"
+import { runCommand } from "@oclif/test"
+import { expect } from "chai"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Tests
 
 describe("describe-design-system", function () {
-  this.timeout(30000)
-  const commandAttributes = [
-    "describe-design-system",
-    `--apiKey=${process.env.TEST_API_KEY}`,
-    `--designSystemId=${process.env.TEST_DESIGN_SYSTEM_ID}`,
-    `--environment=${process.env.TEST_ENVIRONMENT}`,
-  ]
+  it("should run command", async function () {
+    this.timeout(30000)
+    const commandAttributes = [
+      "describe-design-system",
+      `--apiKey=${process.env.TEST_API_KEY}`,
+      `--designSystemId=${process.env.TEST_DESIGN_SYSTEM_ID}`,
+      `--environment=${process.env.TEST_ENVIRONMENT}`,
+    ]
 
-  test
-    .do((ctx) => {
-      console.log(commandAttributes.join(" \\\n  "))
-    })
-    .command(commandAttributes)
-    .it()
+    const result = await runCommand(commandAttributes)
+    if (result.error) console.error(result.error);
+    expect(result.error).to.be.undefined;
+  })
 })
