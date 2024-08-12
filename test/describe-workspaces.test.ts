@@ -9,19 +9,19 @@
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Imports
 
-import { test } from "@oclif/test"
+import { runCommand } from "@oclif/test"
+import { expect } from "chai"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Tests
 
 describe("describe-workspaces", function () {
-  this.timeout(1200000)
-  const commandAttributes = ["describe-workspaces", `--apiKey=${process.env.TEST_API_KEY}`, `--environment=${process.env.TEST_ENVIRONMENT}`]
+  it("should run command", async function () {
+    this.timeout(1200000)
+    const commandAttributes = ["describe-workspaces", `--apiKey=${process.env.TEST_API_KEY}`, `--environment=${process.env.TEST_ENVIRONMENT}`]
 
-  test
-    .do((ctx) => {
-      console.log(commandAttributes.join(" \\\n  "))
-    })
-    .command(commandAttributes)
-    .it()
-})
+    const result = await runCommand(commandAttributes)
+    if (result.error) console.error(result.error);
+    expect(result.error).to.be.undefined;
+  })
+});
