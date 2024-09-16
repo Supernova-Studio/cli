@@ -3028,13 +3028,13 @@
   resolved "https://registry.npmjs.org/@supernova-studio/simple-parse-github-url/-/simple-parse-github-url-1.0.0.tgz"
   integrity sha512-0Cfy6XXUDJ5JV2Yxz4alQEmnQiptSl5fDDfpYG6bvTqZk3ZPjAWMCTd0D7aScltKo02P06Wgj240HStoxatKAA==
 
-"@supernovaio/sdk@^2.0.20":
-  version "2.0.20"
-  resolved "https://registry.npmjs.org/@supernovaio/sdk/-/sdk-2.0.20.tgz"
-  integrity sha512-xZb2+rJG69/11Rs5eXKblcaEE8V1xwmOlcxMyusYCR/CZXcQyd68A+pEAl3b7I3s6/N9ahEsWv20LoEe/24W4A==
+"@supernovaio/sdk@2.0.12":
+  version "2.0.12"
+  resolved "https://registry.npmjs.org/@supernovaio/sdk/-/sdk-2.0.12.tgz"
+  integrity sha512-gE3rvLGS/cyakJ51QKRX7JmnUuGaImVQRYwQJjdQdtkGaKI4e9rcuZxk5RGOIJkCmH8so6ZOqDtrezqkB4NlZA==
   dependencies:
-    "@supernova-studio/client" "0.54.11"
-    "@supernova-studio/model" "0.54.11"
+    "@supernova-studio/client" "^0.4.6"
+    "@supernova-studio/model" "^0.4.1"
     abab "^2.0.5"
     async-mutex "^0.3.1"
     color-string "^1.9.1"
