@@ -9,11 +9,11 @@
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Imports
 
-import { Command, Flags } from "@oclif/core";
-import { Environment, ErrorCode } from "../types/types";
-import { getWritableVersion } from "../utils/sdk";
-import "colors";
-import { DocumentationEnvironment } from "@supernovaio/sdk";
+import { Command, Flags } from "@oclif/core"
+import { Environment, ErrorCode } from "../types/types"
+import { getWritableVersion } from "../utils/sdk"
+import "colors"
+import { DocumentationEnvironment } from "@supernovaio/sdk"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
@@ -30,13 +30,13 @@ export class PublishDocumentation extends Command {
   // MARK: - Command configuration
 
   // Command help description
-  static description = "Publish latest version of the documentation";
+  static description = "Publish latest version of the documentation"
 
   // Examples how to use the command
-  static examples = [`$ @supernovaio/cli publish-documentation --apiKey="{xxx-xxx-xxx}" --designSystemId="{1234}"`];
+  static examples = [`$ @supernovaio/cli publish-documentation --apiKey="{xxx-xxx-xxx}" --designSystemId="{1234}"`]
 
   // How this command can be run
-  static aliases: ["publish-documentation"];
+  static aliases: ["publish-documentation"]
 
   // Static flags to enable / disable features
   static flags = {
@@ -60,40 +60,40 @@ export class PublishDocumentation extends Command {
       hidden: true,
       required: false,
     }),
-  };
+  }
 
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   // MARK: - Command runtime
 
   async run(): Promise<void> {
     try {
-      const { flags } = await this.parse(PublishDocumentation);
+      const { flags } = await this.parse(PublishDocumentation)
 
-      const environment = tryParseDocsEnvironment(flags.target);
+      const environment = tryParseDocsEnvironment(flags.target)
       if (!environment) {
-        const supportedEnvs = [DocumentationEnvironment.live, DocumentationEnvironment.preview];
-        this.error(`Unknown target ${flags.target}, must be one of [${supportedEnvs.join(", ")}]`);
+        const supportedEnvs = [DocumentationEnvironment.live, DocumentationEnvironment.preview]
+        this.error(`Unknown target ${flags.target}, must be one of [${supportedEnvs.join(", ")}]`)
       }
 
       // Get workspace -> design system –> version
-      let { instance, id } = await getWritableVersion(flags);
+      let { instance, id } = await getWritableVersion(flags)
       let result = await instance.documentation.publishDrafts(id, environment, {
         pagePersistentIds: [],
         groupPersistentIds: [],
-      });
+      })
 
       if (result.status === "Success") {
-        this.log("\nDone: Documentation queued for publishing".green);
+        this.log("\nDone: Documentation queued for publishing".green)
       } else if (result.status === "InProgress") {
-        this.log("\n Done: Skipped documentation publish as another build is already in progress".green);
+        this.log("\n Done: Skipped documentation publish as another build is already in progress".green)
       } else if (result.status === "Failed") {
-        throw new Error(`Documentation publish failed with unknown failure`);
+        throw new Error(`Documentation publish failed with unknown failure`)
       }
     } catch (error) {
       // Catch general error
       this.error(`Publishing documentation failed: ${error}`.red, {
         code: ErrorCode.documentationPublishingFailed,
-      });
+      })
     }
   }
 }
@@ -101,11 +101,11 @@ export class PublishDocumentation extends Command {
 function tryParseDocsEnvironment(targetArg: string) {
   switch (targetArg.toLowerCase()) {
     case "live":
-      return DocumentationEnvironment.live;
+      return DocumentationEnvironment.live
     case "preview":
-      return DocumentationEnvironment.preview;
+      return DocumentationEnvironment.preview
 
     default:
-      return null;
+      return null
   }
 }
