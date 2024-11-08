@@ -83,11 +83,11 @@ export class PublishDocumentation extends Command {
         groupPersistentIds: [],
       })
 
-      let jobStatus = publishJob.status
-      while (!isJobStatusDone(jobStatus)) {
+      // Timeout is roughly 30 minutes
+      for (let i = 0; i < 30 * 60; i++) {
         await sleep(1000)
         const updatedJob = await instance.documentation.getDocumentationBuild(designSystem.workspaceId, publishJob.id)
-        jobStatus = updatedJob.status
+        if (isJobStatusDone(updatedJob.status)) break
       }
 
       if (publishJob.status === "Success") {
@@ -96,6 +96,8 @@ export class PublishDocumentation extends Command {
         throw new Error(`Documentation publish failed`)
       } else if (publishJob.status === "Timeout") {
         throw new Error(`Documentation publish timed out`)
+      } else {
+        throw new Error(`Error awaiting publish job`)
       }
     } catch (error) {
       // Catch general error
