@@ -13,6 +13,7 @@ import { Command, Flags } from "@oclif/core"
 import { Environment, ErrorCode } from "../types/types"
 import { getWritableVersion } from "../utils/sdk"
 import "colors"
+import { DocumentationEnvironment } from "@supernovaio/sdk"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
@@ -42,7 +43,11 @@ export class PublishDocumentation extends Command {
     apiKey: Flags.string({ description: "API key to use for accessing Supernova instance", required: true }),
     designSystemId: Flags.string({ description: "Design System to publish the documentation", required: true }),
     dev: Flags.boolean({ description: "When enabled, CLI will target dev server", hidden: true, default: false }),
-    target: Flags.string({ description: "Environment to use for publishing: Live or Preview", required: false, default: "Live" }),
+    target: Flags.string({
+      description: "Environment to use for publishing: Live or Preview",
+      required: false,
+      default: "Live",
+    }),
     environment: Flags.string({
       description: "When set, CLI will target a specific environment",
       hidden: true,
@@ -64,10 +69,18 @@ export class PublishDocumentation extends Command {
     try {
       const { flags } = await this.parse(PublishDocumentation)
 
+      const environment = tryParseDocsEnvironment(flags.target)
+      if (!environment) {
+        const supportedEnvs = [DocumentationEnvironment.live, DocumentationEnvironment.preview]
+        this.error(`Unknown target ${flags.target}, must be one of [${supportedEnvs.join(", ")}]`)
+      }
+
       // Get workspace -> design system –> version
       let { instance, id } = await getWritableVersion(flags)
-      let documentation = await instance.documentation.getDocumentation(id)
-      let result = await instance.documentation.publish(id, flags.target as any)
+      let result = await instance.documentation.publishDrafts(id, environment, {
+        pagePersistentIds: [],
+        groupPersistentIds: [],
+      })
 
       if (result.status === "Success") {
         this.log("\nDone: Documentation queued for publishing".green)
@@ -82,5 +95,17 @@ export class PublishDocumentation extends Command {
         code: ErrorCode.documentationPublishingFailed,
       })
     }
+  }
+}
+
+function tryParseDocsEnvironment(targetArg: string) {
+  switch (targetArg.toLowerCase()) {
+    case "live":
+      return DocumentationEnvironment.live
+    case "preview":
+      return DocumentationEnvironment.preview
+
+    default:
+      return null
   }
 }

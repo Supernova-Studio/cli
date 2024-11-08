@@ -1,111 +1,111 @@
 {
-    "name": "@supernovaio/cli",
-    "description": "Supernova.io Command Line Interface",
-    "version": "1.1.0",
-    "author": "Supernova.io",
-    "homepage": "https://supernova.io/",
-    "keywords": [
-        "Supernova",
-        "Design Systems",
-        "Supernovaio",
-        "SDK",
-        "Design Tokens",
-        "Tokens",
-        "Assets",
-        "Components",
-        "Documentation",
-        "CMS"
+  "name": "@supernovaio/cli",
+  "description": "Supernova.io Command Line Interface",
+  "version": "1.1.1",
+  "author": "Supernova.io",
+  "homepage": "https://supernova.io/",
+  "keywords": [
+    "Supernova",
+    "Design Systems",
+    "Supernovaio",
+    "SDK",
+    "Design Tokens",
+    "Tokens",
+    "Assets",
+    "Components",
+    "Documentation",
+    "CMS"
+  ],
+  "license": "MIT",
+  "bin": {
+    "supernova": "./bin/run"
+  },
+  "bugs": "https://github.com/Supernova-Studio/cli/issues",
+  "dependencies": {
+    "@oclif/core": "4.0.17",
+    "@oclif/plugin-help": "6.2.8",
+    "@oclif/plugin-plugins": "5.4.2",
+    "@supernova-studio/pulsar-core": "2.3.21",
+    "@supernovaio/sdk": "^2.0.27",
+    "axios": "^1.7.7",
+    "colors": "^1.4.0",
+    "minimatch": "^9.0.5",
+    "node-fetch": "^3.2.4"
+  },
+  "bundleDependencies": [
+    "@supernova-studio/pulsar-core",
+    "@supernova-studio/simple-parse-github-url",
+    "@supernova-studio/client",
+    "@supernova-studio/model"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/preset-react": "7.18.6",
+    "@babel/register": "^7.18.9",
+    "@oclif/test": "4.0.8",
+    "@types/chai": "^4",
+    "@types/colors": "^1.2.1",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.11.36",
+    "chai": "^4",
+    "dotenv": "^16.0.0",
+    "eslint": "^7.32.0",
+    "eslint-config-oclif": "^5.2.1",
+    "eslint-config-oclif-typescript": "^3.1.9",
+    "globby": "^11",
+    "mocha": "^9",
+    "oclif": "4.14.15",
+    "shx": "^0.3.3",
+    "ts-node": "10.9.1",
+    "tslib": "^2.3.1",
+    "typescript": "5.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "/bin",
+    "/dist",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json"
+  ],
+  "main": "dist/index.js",
+  "oclif": {
+    "bin": "supernova",
+    "dirname": "supernova",
+    "commands": "./dist/commands",
+    "plugins": [
+      "@oclif/plugin-help",
+      "@oclif/plugin-plugins"
     ],
-    "license": "MIT",
-    "bin": {
-        "supernova": "./bin/run"
-    },
-    "bugs": "https://github.com/Supernova-Studio/cli/issues",
-    "dependencies": {
-        "@oclif/core": "4.0.17",
-        "@oclif/plugin-help": "6.2.8",
-        "@oclif/plugin-plugins": "5.4.2",
-        "@supernova-studio/pulsar-core": "2.3.21",
-        "@supernovaio/sdk": "2.0.12",
-        "axios": "^1.7.7",
-        "colors": "^1.4.0",
-        "minimatch": "^9.0.5",
-        "node-fetch": "^3.2.4"
-    },
-    "bundleDependencies": [
-        "@supernova-studio/pulsar-core",
-        "@supernova-studio/simple-parse-github-url",
-        "@supernova-studio/client",
-        "@supernova-studio/model"
-    ],
-    "devDependencies": {
-        "@babel/core": "^7.9.0",
-        "@babel/preset-env": "^7.3.4",
-        "@babel/preset-react": "7.18.6",
-        "@babel/register": "^7.18.9",
-        "@oclif/test": "4.0.8",
-        "@types/chai": "^4",
-        "@types/colors": "^1.2.1",
-        "@types/mocha": "^9.0.0",
-        "@types/node": "^16.11.36",
-        "chai": "^4",
-        "dotenv": "^16.0.0",
-        "eslint": "^7.32.0",
-        "eslint-config-oclif": "^5.2.1",
-        "eslint-config-oclif-typescript": "^3.1.9",
-        "globby": "^11",
-        "mocha": "^9",
-        "oclif": "4.14.15",
-        "shx": "^0.3.3",
-        "ts-node": "10.9.1",
-        "tslib": "^2.3.1",
-        "typescript": "5.2.2"
-    },
-    "engines": {
-        "node": ">=18.0.0"
-    },
-    "files": [
-        "/bin",
-        "/dist",
-        "/npm-shrinkwrap.json",
-        "/oclif.manifest.json"
-    ],
-    "main": "dist/index.js",
-    "oclif": {
-        "bin": "supernova",
-        "dirname": "supernova",
-        "commands": "./dist/commands",
-        "plugins": [
-            "@oclif/plugin-help",
-            "@oclif/plugin-plugins"
-        ],
-        "topicSeparator": " ",
-        "topics": {
-            "sync-tokens": {
-                "description": "Synchronize tokens from Figma Tokens plugin to Supernova workspaces"
-            },
-            "describe-design-system": {
-                "description": "Describe structure (brands and themes) of selected design system"
-            },
-            "describe-workspaces": {
-                "description": "Describe structure of all workspaces provided API key has access to"
-            },
-            "publish-documentation": {
-                "description": "Publish current documentation"
-            },
-            "run-local-exporter": {
-                "description": "Run exporer package locally"
-            }
-        }
-    },
-    "repository": "https://github.com/Supernova-Studio/cli",
-    "scripts": {
-        "build": "shx rm -rf dist && tsc -b",
-        "lint": "eslint . --ext .ts --config .eslintrc",
-        "postpack": "shx rm -f oclif.manifest.json",
-        "prepack": "yarn build && oclif manifest",
-        "test": "DEBUG=* && npm run build && env TS_NODE_PROJECT=\"tsconfig.testing.json\" mocha --require ts-node/register --forbid-only \"test/**/sync-tokens.test.ts\"",
-        "publish-package": "npm run build && npm run prepack && npm publish --access public && npm run postpack"
-    },
-    "types": "dist/index.d.ts"
+    "topicSeparator": " ",
+    "topics": {
+      "sync-tokens": {
+        "description": "Synchronize tokens from Figma Tokens plugin to Supernova workspaces"
+      },
+      "describe-design-system": {
+        "description": "Describe structure (brands and themes) of selected design system"
+      },
+      "describe-workspaces": {
+        "description": "Describe structure of all workspaces provided API key has access to"
+      },
+      "publish-documentation": {
+        "description": "Publish current documentation"
+      },
+      "run-local-exporter": {
+        "description": "Run exporer package locally"
+      }
+    }
+  },
+  "repository": "https://github.com/Supernova-Studio/cli",
+  "scripts": {
+    "build": "shx rm -rf dist && tsc -b",
+    "lint": "eslint . --ext .ts --config .eslintrc",
+    "postpack": "shx rm -f oclif.manifest.json",
+    "prepack": "yarn build && oclif manifest",
+    "test": "DEBUG=* && npm run build && env TS_NODE_PROJECT=\"tsconfig.testing.json\" mocha --require ts-node/register --forbid-only \"test/**/sync-tokens.test.ts\"",
+    "publish-package": "npm run build && npm run prepack && npm publish --access public && npm run postpack"
+  },
+  "types": "dist/index.d.ts"
 }
