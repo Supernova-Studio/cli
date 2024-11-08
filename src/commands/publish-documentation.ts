@@ -85,8 +85,8 @@ export class PublishDocumentation extends Command {
       }
 
       // Get workspace -> design system –> version
-      let { instance, id, designSystem } = await getWritableVersion(flags)
-      let publishJob = await instance.documentation.publishDrafts(id, environment, {
+      const { instance, id, designSystem } = await getWritableVersion(flags)
+      const publishJob = await instance.documentation.publishDrafts(id, environment, {
         pagePersistentIds: [],
         groupPersistentIds: [],
       })
