@@ -86,7 +86,7 @@ export class PublishDocumentation extends Command {
 
       // Get workspace -> design system –> version
       const { instance, id, designSystem } = await getWritableVersion(flags)
-      const publishJob = await instance.documentation.publishDrafts(id, environment, {
+      let publishJob = await instance.documentation.publishDrafts(id, environment, {
         pagePersistentIds: [],
         groupPersistentIds: [],
       })
@@ -100,8 +100,8 @@ export class PublishDocumentation extends Command {
       // Timeout is roughly 30 minutes
       for (let i = 0; i < 30 * 60; i++) {
         await sleep(1000)
-        const updatedJob = await instance.documentation.getDocumentationBuild(designSystem.workspaceId, publishJob.id)
-        if (isJobStatusDone(updatedJob.status)) break
+        publishJob = await instance.documentation.getDocumentationBuild(designSystem.workspaceId, publishJob.id)
+        if (isJobStatusDone(publishJob.status)) break
       }
 
       if (publishJob.status === "Success") {
