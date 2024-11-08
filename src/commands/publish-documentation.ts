@@ -13,7 +13,8 @@ import { Command, Flags } from "@oclif/core"
 import { Environment, ErrorCode } from "../types/types"
 import { getWritableVersion } from "../utils/sdk"
 import "colors"
-import { DocumentationEnvironment } from "@supernovaio/sdk"
+import { DocumentationEnvironment, ExportBuildStatus } from "@supernovaio/sdk"
+import { sleep } from "../utils/common"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
@@ -60,6 +61,14 @@ export class PublishDocumentation extends Command {
       hidden: true,
       required: false,
     }),
+    awaitPublishJob: Flags.boolean({
+      description:
+        "Whether to block the process until the publishing is done. " +
+        "Setting the flag to false will exit with success as long as documentation publish was successfully triggered, " +
+        "but before the publish is completed. Setting the flag to true will exit once the publish is complete and will " +
+        "throw if documentation publish is not successful.",
+      default: true,
+    }),
   }
 
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -76,18 +85,33 @@ export class PublishDocumentation extends Command {
       }
 
       // Get workspace -> design system –> version
-      let { instance, id } = await getWritableVersion(flags)
-      let result = await instance.documentation.publishDrafts(id, environment, {
+      const { instance, id, designSystem } = await getWritableVersion(flags)
+      const publishJob = await instance.documentation.publishDrafts(id, environment, {
         pagePersistentIds: [],
         groupPersistentIds: [],
       })
 
-      if (result.status === "Success") {
+      if (!(flags.awaitPublishJob ?? true)) {
+        this.log(`Publishing documentation in ${designSystem.name} has started, job await is disabled, exiting...`)
+      } else {
+        this.log(`Publishing documentation in ${designSystem.name}...`)
+      }
+
+      // Timeout is roughly 30 minutes
+      for (let i = 0; i < 30 * 60; i++) {
+        await sleep(1000)
+        const updatedJob = await instance.documentation.getDocumentationBuild(designSystem.workspaceId, publishJob.id)
+        if (isJobStatusDone(updatedJob.status)) break
+      }
+
+      if (publishJob.status === "Success") {
         this.log("\nDone: Documentation queued for publishing".green)
-      } else if (result.status === "InProgress") {
-        this.log("\n Done: Skipped documentation publish as another build is already in progress".green)
-      } else if (result.status === "Failed") {
-        throw new Error(`Documentation publish failed with unknown failure`)
+      } else if (publishJob.status === "Failed") {
+        throw new Error(`Documentation publish failed`)
+      } else if (publishJob.status === "Timeout") {
+        throw new Error(`Documentation publish timed out`)
+      } else {
+        throw new Error(`Error awaiting publish job`)
       }
     } catch (error) {
       // Catch general error
@@ -108,4 +132,10 @@ function tryParseDocsEnvironment(targetArg: string) {
     default:
       return null
   }
+}
+
+function isJobStatusDone(status: ExportBuildStatus): boolean {
+  return (
+    status === ExportBuildStatus.Failed || status === ExportBuildStatus.Success || status === ExportBuildStatus.Timeout
+  )
 }
