@@ -86,15 +86,21 @@ export class PublishDocumentation extends Command {
 
       // Get workspace -> design system –> version
       const { instance, id, designSystem } = await getWritableVersion(flags)
+
+      this.log(`Queueing documentation publish in ${designSystem.name}...`)
+
       let publishJob = await instance.documentation.publishDrafts(id, environment, {
         pagePersistentIds: [],
         groupPersistentIds: [],
       })
 
-      if (!(flags.awaitPublishJob ?? true)) {
-        this.log(`Publishing documentation in ${designSystem.name} has started, job await is disabled, exiting...`)
+      this.log(`Documentation queued for publishing`.green);
+
+      if (!flags.awaitPublishJob) {
+        this.log(`Documentation publish await is disabled, exiting before the publish is finished.`.yellow)
+        return;
       } else {
-        this.log(`Publishing documentation in ${designSystem.name}...`)
+        this.log(`Waiting for the documentation publish to be finished...`); 
       }
 
       // Timeout is roughly 30 minutes
