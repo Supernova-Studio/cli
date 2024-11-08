@@ -13,7 +13,8 @@ import { Command, Flags } from "@oclif/core"
 import { Environment, ErrorCode } from "../types/types"
 import { getWritableVersion } from "../utils/sdk"
 import "colors"
-import { DocumentationEnvironment } from "@supernovaio/sdk"
+import { DocumentationEnvironment, ExportBuildStatus } from "@supernovaio/sdk"
+import { sleep } from "../utils/common"
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // MARK: - Definition
@@ -76,18 +77,25 @@ export class PublishDocumentation extends Command {
       }
 
       // Get workspace -> design system –> version
-      let { instance, id } = await getWritableVersion(flags)
-      let result = await instance.documentation.publishDrafts(id, environment, {
+      let { instance, id, designSystem } = await getWritableVersion(flags)
+      let publishJob = await instance.documentation.publishDrafts(id, environment, {
         pagePersistentIds: [],
         groupPersistentIds: [],
       })
 
-      if (result.status === "Success") {
+      let jobStatus = publishJob.status
+      while (!isJobStatusDone(jobStatus)) {
+        await sleep(1000)
+        const updatedJob = await instance.documentation.getDocumentationBuild(designSystem.workspaceId, publishJob.id)
+        jobStatus = updatedJob.status
+      }
+
+      if (publishJob.status === "Success") {
         this.log("\nDone: Documentation queued for publishing".green)
-      } else if (result.status === "InProgress") {
-        this.log("\n Done: Skipped documentation publish as another build is already in progress".green)
-      } else if (result.status === "Failed") {
-        throw new Error(`Documentation publish failed with unknown failure`)
+      } else if (publishJob.status === "Failed") {
+        throw new Error(`Documentation publish failed`)
+      } else if (publishJob.status === "Timeout") {
+        throw new Error(`Documentation publish timed out`)
       }
     } catch (error) {
       // Catch general error
@@ -108,4 +116,10 @@ function tryParseDocsEnvironment(targetArg: string) {
     default:
       return null
   }
+}
+
+function isJobStatusDone(status: ExportBuildStatus): boolean {
+  return (
+    status === ExportBuildStatus.Failed || status === ExportBuildStatus.Success || status === ExportBuildStatus.Timeout
+  )
 }
