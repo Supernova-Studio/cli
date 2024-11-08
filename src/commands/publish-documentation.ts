@@ -61,6 +61,14 @@ export class PublishDocumentation extends Command {
       hidden: true,
       required: false,
     }),
+    awaitPublishJob: Flags.boolean({
+      description:
+        "Whether to block the process until the publishing is done. " +
+        "Setting the flag to false will exit with success as long as documentation publish was successfully triggered, " +
+        "but before the publish is completed. Setting the flag to true will exit once the publish is complete and will " +
+        "throw if documentation publish is not successful.",
+      default: true,
+    }),
   }
 
   // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -82,6 +90,12 @@ export class PublishDocumentation extends Command {
         pagePersistentIds: [],
         groupPersistentIds: [],
       })
+
+      if (!(flags.awaitPublishJob ?? true)) {
+        this.log(`Publishing documentation in ${designSystem.name} has started, job await is disabled, exiting...`)
+      } else {
+        this.log(`Publishing documentation in ${designSystem.name}...`)
+      }
 
       // Timeout is roughly 30 minutes
       for (let i = 0; i < 30 * 60; i++) {
