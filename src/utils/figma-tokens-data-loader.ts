@@ -6,6 +6,7 @@ import {
   DTPluginToSupernovaMapType,
   DTPluginPreciseCopyStrategy,
   DTPluginThemeOverrideStrategy,
+  toPreciseCopyStrategy,
 } from "@supernovaio/sdk"
 import * as fs from "fs"
 const path = require("path")
@@ -211,8 +212,8 @@ export class FigmaTokensDataLoader {
       ...(mapping.settings ?? {}),
       dryRun: mapping.settings?.dryRun ?? false,
       verbose: mapping.settings?.verbose ?? false,
-      preciseCopy: (mapping.settings?.preciseCopy ? "deleteAll" : "none") as DTPluginPreciseCopyStrategy,
-      themeOverridesStrategy: "default" as DTPluginThemeOverrideStrategy,
+      preciseCopy: toPreciseCopyStrategy(mapping.settings?.preciseCopy),
+      themeOverridesStrategy: mapping.settings?.themeOverridesStrategy ?? "default" as DTPluginThemeOverrideStrategy,
     }
 
     return {
