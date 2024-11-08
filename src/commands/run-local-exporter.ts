@@ -76,13 +76,17 @@ export class RunLocalExporter extends Command {
     apiKey: Flags.string({ description: "API key to use for accessing Supernova instance", required: true }),
     designSystemId: Flags.string({ description: "Design System to export from", required: true }),
     exporterDir: Flags.string({ description: "Path to exporter package", required: true }),
-    outputDir: Flags.string({ description: "Path to output folder. Must be empty, unless `forceClearOutputDir` is set", required: true }),
+    outputDir: Flags.string({
+      description: "Path to output folder. Must be empty, unless `forceClearOutputDir` is set",
+      required: true,
+    }),
     themeId: Flags.string({
       description: "Theme to export. Will only be used when exporter has usesThemes: true, and is optional",
       required: false,
     }),
     brandId: Flags.string({
-      description: "Brand to export. Will only be used when exporter has usesBrands: true, but then it is required to be provided",
+      description:
+        "Brand to export. Will only be used when exporter has usesBrands: true, but then it is required to be provided",
       required: false,
     }),
     allowOverridingOutput: Flags.boolean({
@@ -143,7 +147,7 @@ export class RunLocalExporter extends Command {
 
   async executeExporter(
     flags: RunLocalExporterFlags,
-    versionId: string
+    versionId: string,
   ): Promise<{
     logger: PLLogger
     result: PCEngineExporterProcessingResult | Error
@@ -200,7 +204,7 @@ export class RunLocalExporter extends Command {
         const destination = path.join(flags.outputDir, file.path)
         if (fs.existsSync(destination)) {
           throw new Error(
-            `Exporter produced file for destination ${destination} but that file already exists. Enable --allowOverridingOutput option to allow overriding`
+            `Exporter produced file for destination ${destination} but that file already exists. Enable --allowOverridingOutput option to allow overriding`,
           )
         }
       }
@@ -230,7 +234,7 @@ export class RunLocalExporter extends Command {
     const chunkSize = 4
     for (let i = 0; i < result.emittedFiles.length; i += chunkSize) {
       const chunk = result.emittedFiles.slice(i, i + chunkSize)
-      await Promise.all(chunk.map((file) => processFile(file)))
+      await Promise.all(chunk.map(file => processFile(file)))
     }
 
     // Write all files from the temporary structure to the filesystem as a final step - this is to avoid partial writes

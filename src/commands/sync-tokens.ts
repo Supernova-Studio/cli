@@ -65,7 +65,10 @@ export class SyncDesignTokens extends Command {
       exactlyOne: ["tokenDirPath", "tokenFilePath"],
     }),
     configFilePath: Flags.string({ description: "Path to configuration JSON file", required: true, exclusive: [] }),
-    apiUrl: Flags.string({ description: "API url to use for accessing Supernova instance, would ignore defaults", hidden: true }),
+    apiUrl: Flags.string({
+      description: "API url to use for accessing Supernova instance, would ignore defaults",
+      hidden: true,
+    }),
     environment: Flags.string({
       description: "When set, CLI will target a specific environment",
       hidden: true,
@@ -109,7 +112,7 @@ export class SyncDesignTokens extends Command {
       let tokenDefinition = flags.tokenDirPath
         ? await dataLoader.loadTokensFromDirectory(flags.tokenDirPath, flags.configFilePath)
         : await dataLoader.loadTokensFromPath(flags.tokenFilePath!)
-      const response = await instance.versions.writeTokenStudioData(id, buildData(tokenDefinition)) as any
+      const response = (await instance.versions.writeTokenStudioData(id, buildData(tokenDefinition))) as any
       if (response?.result?.logs && response.result.logs.length > 0) {
         for (const log of response.result.logs) {
           this.log(log)

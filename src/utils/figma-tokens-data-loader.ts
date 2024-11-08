@@ -157,7 +157,7 @@ export class FigmaTokensDataLoader {
         ((typeof map.tokensTheme !== "string" && !Array.isArray(map.tokensTheme)) || map.tokensTheme.length === 0)
       ) {
         throw new Error(
-          "Unable to load mapping file: `mapping`.`tokensTheme` must be a non-empty string or non-empty array of strings"
+          "Unable to load mapping file: `mapping`.`tokensTheme` must be a non-empty string or non-empty array of strings",
         )
       }
       if (!map.supernovaBrand || typeof map.supernovaBrand !== "string" || map.supernovaBrand.length === 0) {
@@ -165,7 +165,7 @@ export class FigmaTokensDataLoader {
       }
       if (map.supernovaTheme && (typeof map.supernovaTheme !== "string" || map.supernovaTheme.length === 0)) {
         throw new Error(
-          "Unable to load mapping file: `supernovaTheme` may be empty but must be non-empty string if not"
+          "Unable to load mapping file: `supernovaTheme` may be empty but must be non-empty string if not",
         )
       }
     }
@@ -213,7 +213,7 @@ export class FigmaTokensDataLoader {
       dryRun: mapping.settings?.dryRun ?? false,
       verbose: mapping.settings?.verbose ?? false,
       preciseCopy: toPreciseCopyStrategy(mapping.settings?.preciseCopy),
-      themeOverridesStrategy: mapping.settings?.themeOverridesStrategy ?? "default" as DTPluginThemeOverrideStrategy,
+      themeOverridesStrategy: mapping.settings?.themeOverridesStrategy ?? ("default" as DTPluginThemeOverrideStrategy),
     }
 
     return {
